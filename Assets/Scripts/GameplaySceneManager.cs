@@ -30,9 +30,35 @@ public class GameplaySceneManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-
+            Click();
         }
 
+        Hover();
+    }
+
+    private void Click()
+    {
+        RaycastHit hit;
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            Transform objectHit = hit.transform;
+
+            Debug.Log(objectHit);
+
+            if (objectHit.tag == "CellAdd")
+            {
+                CellAdd cell = objectHit.GetComponent<CellAdd>();
+
+                _terrain.AddNewCell(cell.Position);
+            }
+        }
+    }
+
+    private void Hover()
+    {
         RaycastHit hit;
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -54,7 +80,7 @@ public class GameplaySceneManager : MonoBehaviour
 
                 _hovered.Select();
             }
-            else if(_hovered != null)
+            else if (_hovered != null)
             {
                 _hovered.Unselect();
 

@@ -15,7 +15,7 @@ public class TerrainController : MonoBehaviour
     private GameObject _cell;
 
     [SerializeField]
-    private GameObject _cellAdd;
+    private CellAdd _cellAdd;
 
     [SerializeField]
     private GameObject _roadConnection;
@@ -60,18 +60,89 @@ public class TerrainController : MonoBehaviour
 
 
 
+    public void AddNewCell(Vector2Int position)
+    {
+        _terrainData.AddNewCell(position);
+
+
+        for (int x = position.x - 1; x <= position.x + 1; x++)
+        {
+            for (int z = position.y - 1; z <= position.y + 1; z++)
+            {
+                if (_terrain.TryGetValue(new Vector2Int(x, z), out GameObject obj))
+                {
+                    Destroy(obj);
+
+                    _terrain.Remove(new Vector2Int(x, z));
+                }
+            }
+        }
+
+
+        if (_terrainData.ContainsCell(position, out CellData cell))
+        {
+            GenerateCell(position);
+        }
+
+
+        if (_terrainData.ContainsRoad(position + new Vector2Int(-1, 0), out ConnectionData left))
+        {
+            GenerateRoad(left.Position, left.Type);
+        }
+
+        if (_terrainData.ContainsRoad(position + new Vector2Int(1, 0), out ConnectionData right))
+        {
+            GenerateRoad(right.Position, right.Type);
+        }
+
+        if (_terrainData.ContainsRoad(position + new Vector2Int(0, -1), out ConnectionData bottom))
+        {
+            GenerateRoad(bottom.Position, bottom.Type);
+        }
+
+        if (_terrainData.ContainsRoad(position + new Vector2Int(0, 1), out ConnectionData top))
+        {
+            GenerateRoad(top.Position, top.Type);
+        }
+
+
+        if (_terrainData.ContainsJoint(position + new Vector2Int(-1, -1), out JoinData leftBottom))
+        {
+            GenerateJoint(leftBottom.Position, leftBottom.Type,
+                leftBottom.Left, leftBottom.Right, leftBottom.Bottom, leftBottom.Top);
+        }
+
+        if (_terrainData.ContainsJoint(position + new Vector2Int(-1, 1), out JoinData leftTop))
+        {
+            GenerateJoint(leftTop.Position, leftTop.Type,
+                leftTop.Left, leftTop.Right, leftTop.Bottom, leftTop.Top);
+        }
+
+        if (_terrainData.ContainsJoint(position + new Vector2Int(1, -1), out JoinData rightBottom))
+        {
+            GenerateJoint(rightBottom.Position, rightBottom.Type,
+                rightBottom.Left, rightBottom.Right, rightBottom.Bottom, rightBottom.Top);
+        }
+
+        if (_terrainData.ContainsJoint(position + new Vector2Int(1, 1), out JoinData rightTop))
+        {
+            GenerateJoint(rightTop.Position, rightTop.Type,
+                rightTop.Left, rightTop.Right, rightTop.Bottom, rightTop.Top);
+        }
+
+
+        GenerateSale();
+    }
+
+
+
     private void Generate()
     {
         CellData[] cells = _terrainData.Cells;
 
         for (int i = 0; i < cells.Length; i++)
         {
-            Vector3 pos = new Vector3(cells[i].Position.x / 2 * _cellSize + cells[i].Position.x / 2 * _connectionSize,
-                0f, cells[i].Position.y / 2 * _cellSize + cells[i].Position.y / 2 * _connectionSize);
-
-            GameObject obj = Instantiate(_cell, pos, Quaternion.identity);
-
-            _terrain.Add(cells[i].Position, obj);
+            GenerateCell(cells[i].Position);
         }
 
 
@@ -82,37 +153,7 @@ public class TerrainController : MonoBehaviour
             if (connections[i].Type == ConnectionType.None)
                 continue;
 
-            Vector3 offest = Vector3.zero;
-
-            Quaternion rotation = Quaternion.identity;
-
-            if (connections[i].Position.x % 2 != 0)
-            {
-                offest.x = (connections[i].Position.x < 0 ? -_cellSize - _connectionSize : _cellSize + _connectionSize) * 0.5f;
-            }
-
-            if (connections[i].Position.y % 2 != 0)
-            {
-                offest.z = (connections[i].Position.y < 0 ? -_cellSize - _connectionSize : _cellSize + _connectionSize) * 0.5f;
-
-                rotation = Quaternion.Euler(0f, 90f, 0f);
-            }
-
-            Vector3 pos = new Vector3(connections[i].Position.x / 2 * _connectionSize + connections[i].Position.x / 2 * _cellSize,
-                0f, connections[i].Position.y / 2 * _connectionSize + connections[i].Position.y / 2 * _cellSize);
-
-            GameObject obj = null;
-
-            if (connections[i].Type == ConnectionType.Road)
-            {
-                obj = Instantiate(_roadConnection, pos + offest, rotation);
-            }
-            else if (connections[i].Type == ConnectionType.Grass)
-            {
-                obj = Instantiate(_grassConnection, pos + offest, rotation);
-            }
-
-            _terrain.Add(connections[i].Position, obj);
+            GenerateRoad(connections[i].Position, connections[i].Type);
         }
 
 
@@ -120,106 +161,8 @@ public class TerrainController : MonoBehaviour
 
         for(int i = 0; i < joints.Length; i++)
         {
-            Vector3 offest = Vector3.zero;
-
-            Quaternion rotation = Quaternion.identity;
-
-            if (joints[i].Position.x % 2 != 0)
-            {
-                offest.x = (joints[i].Position.x < 0 ? -_cellSize - _connectionSize : _cellSize + _connectionSize) * 0.5f;
-            }
-
-            if (joints[i].Position.y % 2 != 0)
-            {
-                offest.z = (joints[i].Position.y < 0 ? -_cellSize - _connectionSize : _cellSize + _connectionSize) * 0.5f;
-            }
-
-            Vector3 pos = new Vector3(joints[i].Position.x / 2 * _connectionSize + joints[i].Position.x / 2 * _cellSize,
-                0f, joints[i].Position.y / 2 * _connectionSize + joints[i].Position.y / 2 * _cellSize);
-
-            GameObject obj = null;
-
-            switch (joints[i].Type)
-            {
-                case JoinType.RoadX:
-                    obj = Instantiate(_roadXJoint, pos + offest, rotation);
-                    break;
-
-                case JoinType.RoadT:
-                    if (!joints[i].Left)
-                    {
-                        rotation = Quaternion.Euler(0f, 90f, 0f);
-                    }
-                    else if (!joints[i].Right)
-                    {
-                        rotation = Quaternion.Euler(0f, -90f, 0f);
-                    }
-                    else if(!joints[i].Top)
-                    {
-                        rotation = Quaternion.Euler(0f, 180f, 0f);
-                    }
-
-                    obj = Instantiate(_roadTJoint, pos + offest, rotation);
-                    break;
-
-                case JoinType.RoadI:
-                    if (joints[i].Left)
-                    {
-                        rotation = Quaternion.Euler(0f, 90f, 0f);
-                    }
-
-                    obj = Instantiate(_roadIJoint, pos + offest, rotation);
-                    break;
-
-                case JoinType.RoadL:
-                    if (joints[i].Left)
-                    {
-                        if (joints[i].Bottom)
-                        {
-                            rotation = Quaternion.Euler(0f, -90f, 0f);
-                        }
-                    }
-                    else
-                    {
-                        if (joints[i].Top)
-                        {
-                            rotation = Quaternion.Euler(0f, 90f, 0f);
-                        }
-                        else
-                        {
-                            rotation = Quaternion.Euler(0f, 180f, 0f);
-                        }
-                    }
-
-                    obj = Instantiate(_roadLJoint, pos + offest, rotation);
-                    break;
-
-                case JoinType.RoadU:
-                    if (joints[i].Left)
-                    {
-                        rotation = Quaternion.Euler(0f, -90f, 0f);
-                    }
-                    else if (joints[i].Right)
-                    {
-                        rotation = Quaternion.Euler(0f, 90f, 0f);
-                    }
-                    else if (joints[i].Bottom)
-                    {
-                        rotation = Quaternion.Euler(0f, 180f, 0f);
-                    }
-
-                    obj = Instantiate(_roadUJoint, pos + offest, rotation);
-                    break;
-
-                case JoinType.Grass:
-                    obj = Instantiate(_grassJoint, pos + offest, rotation);
-                    break;
-
-                default:
-                    continue;
-            }
-
-            _terrain.Add(joints[i].Position, obj);
+            GenerateJoint(joints[i].Position, joints[i].Type,
+                joints[i].Left, joints[i].Right, joints[i].Bottom, joints[i].Top);
         }
     }
 
@@ -360,18 +303,176 @@ public class TerrainController : MonoBehaviour
         }
 
 
-        IEnumerable<Vector2Int> list = leftCells.Concat(rightCells).Concat(bottomCells).Concat(topCells)
+        IEnumerable<Vector2Int> list = leftCells.Concat(rightCells).Concat(bottomCells).Concat(topCells);
 
         foreach (Vector2Int position in list)
         {
+            if (_terrain.ContainsKey(position))
+                continue;
+
             Vector3 pos = new Vector3(position.x / 2 * _cellSize + position.x / 2 * _connectionSize,
                 0f, position.y / 2 * _cellSize + position.y / 2 * _connectionSize);
 
-            GameObject obj = Instantiate(_cellAdd, pos, Quaternion.identity);
+            CellAdd obj = Instantiate(_cellAdd, pos, Quaternion.identity);
 
-            _terrain.Add(position, obj);
+            obj.Setup(position);
+
+            _terrain.Add(position, obj.gameObject);
         }
     }
+
+
+
+    private void GenerateCell(Vector2Int position)
+    {
+        Vector3 pos = new Vector3(position.x / 2 * _cellSize + position.x / 2 * _connectionSize,
+                0f, position.y / 2 * _cellSize + position.y / 2 * _connectionSize);
+
+        GameObject obj = Instantiate(_cell, pos, Quaternion.identity);
+
+        _terrain.Add(position, obj);
+    }
+
+    private void GenerateRoad(Vector2Int position, ConnectionType connectionType)
+    {
+        Vector3 offest = Vector3.zero;
+
+        Quaternion rotation = Quaternion.identity;
+
+        if (position.x % 2 != 0)
+        {
+            offest.x = (position.x < 0 ? -_cellSize - _connectionSize : _cellSize + _connectionSize) * 0.5f;
+        }
+
+        if (position.y % 2 != 0)
+        {
+            offest.z = (position.y < 0 ? -_cellSize - _connectionSize : _cellSize + _connectionSize) * 0.5f;
+
+            rotation = Quaternion.Euler(0f, 90f, 0f);
+        }
+
+        Vector3 pos = new Vector3(position.x / 2 * _connectionSize + position.x / 2 * _cellSize,
+            0f, position.y / 2 * _connectionSize + position.y / 2 * _cellSize);
+
+        GameObject obj = null;
+
+        if (connectionType == ConnectionType.Road)
+        {
+            obj = Instantiate(_roadConnection, pos + offest, rotation);
+        }
+        else if (connectionType == ConnectionType.Grass)
+        {
+            obj = Instantiate(_grassConnection, pos + offest, rotation);
+        }
+
+        _terrain.Add(position, obj);
+    }
+
+    private void GenerateJoint(Vector2Int position, JoinType joinType, bool left, bool right, bool bottom, bool top)
+    {
+        Vector3 offest = Vector3.zero;
+
+        Quaternion rotation = Quaternion.identity;
+
+        if (position.x % 2 != 0)
+        {
+            offest.x = (position.x < 0 ? -_cellSize - _connectionSize : _cellSize + _connectionSize) * 0.5f;
+        }
+
+        if (position.y % 2 != 0)
+        {
+            offest.z = (position.y < 0 ? -_cellSize - _connectionSize : _cellSize + _connectionSize) * 0.5f;
+        }
+
+        Vector3 pos = new Vector3(position.x / 2 * _connectionSize + position.x / 2 * _cellSize,
+            0f, position.y / 2 * _connectionSize + position.y / 2 * _cellSize);
+
+        GameObject obj = null;
+
+        switch (joinType)
+        {
+            case JoinType.RoadX:
+                obj = Instantiate(_roadXJoint, pos + offest, rotation);
+                break;
+
+            case JoinType.RoadT:
+                if (!left)
+                {
+                    rotation = Quaternion.Euler(0f, 90f, 0f);
+                }
+                else if (!right)
+                {
+                    rotation = Quaternion.Euler(0f, -90f, 0f);
+                }
+                else if (!top)
+                {
+                    rotation = Quaternion.Euler(0f, 180f, 0f);
+                }
+
+                obj = Instantiate(_roadTJoint, pos + offest, rotation);
+                break;
+
+            case JoinType.RoadI:
+                if (left)
+                {
+                    rotation = Quaternion.Euler(0f, 90f, 0f);
+                }
+
+                obj = Instantiate(_roadIJoint, pos + offest, rotation);
+                break;
+
+            case JoinType.RoadL:
+                if (left)
+                {
+                    if (bottom)
+                    {
+                        rotation = Quaternion.Euler(0f, -90f, 0f);
+                    }
+                }
+                else
+                {
+                    if (top)
+                    {
+                        rotation = Quaternion.Euler(0f, 90f, 0f);
+                    }
+                    else
+                    {
+                        rotation = Quaternion.Euler(0f, 180f, 0f);
+                    }
+                }
+
+                obj = Instantiate(_roadLJoint, pos + offest, rotation);
+                break;
+
+            case JoinType.RoadU:
+                if (left)
+                {
+                    rotation = Quaternion.Euler(0f, -90f, 0f);
+                }
+                else if (right)
+                {
+                    rotation = Quaternion.Euler(0f, 90f, 0f);
+                }
+                else if (bottom)
+                {
+                    rotation = Quaternion.Euler(0f, 180f, 0f);
+                }
+
+                obj = Instantiate(_roadUJoint, pos + offest, rotation);
+                break;
+
+            case JoinType.Grass:
+                obj = Instantiate(_grassJoint, pos + offest, rotation);
+                break;
+
+            default:
+                return;
+        }
+
+        _terrain.Add(position, obj);
+    }
+
+
 
 
     [ContextMenu("Generate Random")]

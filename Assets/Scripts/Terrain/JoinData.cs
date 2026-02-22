@@ -26,6 +26,11 @@ public class JoinData
         {
             return _joints[0];
         }
+
+        set
+        {
+            _joints[0] = value;
+        }
     }
 
     public bool Right
@@ -33,6 +38,11 @@ public class JoinData
         get
         {
             return _joints[1];
+        }
+
+        set
+        {
+            _joints[1] = value;
         }
     }
 
@@ -42,6 +52,11 @@ public class JoinData
         {
             return _joints[2];
         }
+
+        set
+        {
+            _joints[2] = value;
+        }
     }
 
     public bool Bottom
@@ -49,6 +64,11 @@ public class JoinData
         get
         {
             return _joints[3];
+        }
+
+        set
+        {
+            _joints[3] = value;
         }
     }
 

@@ -1,11 +1,12 @@
+using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
-using JetBrains.Annotations;
 using System.Linq;
 using System.Xml.Schema;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 [Serializable]
 public class TerrainData
@@ -213,16 +214,34 @@ public class TerrainData
 
     public bool ContainsCell(Vector2Int position, out CellData cell)
     {
-        bool exists = _cells.ContainsKey(position);
-
-        if (!exists)
-        {
-            cell = null;
-
-            return false;
-        }
-
         return _cells.TryGetValue(position, out cell);
+    }
+
+
+    public bool ContainsRoad(Vector2Int position, out ConnectionData connection)
+    {
+        return _connections.TryGetValue(position, out connection); 
+    }
+
+    public bool ContainsJoint(Vector2Int position, out JoinData joint)
+    {
+        return _joints.TryGetValue(position, out joint);
+    }
+
+
+    public void AddNewCell(Vector2Int position)
+    {
+        AddCell(position.x, position.y, true);
+
+        AddRoad(position.x, position.y);
+
+        AddJoint(position.x - 1, position.y - 1);
+
+        AddJoint(position.x - 1, position.y + 1);
+
+        AddJoint(position.x + 1, position.y - 1);
+
+        AddJoint(position.x + 1, position.y + 1);
     }
 
 
@@ -238,8 +257,6 @@ public class TerrainData
                 int cellZ = (z - _sizeZ / 2) * 2;
 
                 AddCell(cellX, cellZ);
-
-                Debug.Log($"Cell: {cellX} : {cellZ}");
             }
         }
 
@@ -247,85 +264,7 @@ public class TerrainData
         {
             for (int z = -_sizeZ / 2 * 2; z <= (_sizeZ - 1) / 2 * 2; z += 2)
             {
-                Debug.Log($"{x} : {z}");
-
-                bool previousX = _connections.TryGetValue(new Vector2Int(x - 1, z), out ConnectionData left);
-
-                bool previousZ = _connections.TryGetValue(new Vector2Int(x, z - 1), out ConnectionData bottom);
-
-
-                bool leftRoad = UnityEngine.Random.Range(0, 2) == 0;
-
-                bool bottomRoad = UnityEngine.Random.Range(0, 2) == 0;
-
-
-                if (!leftRoad && !bottomRoad)
-                {
-                    if (UnityEngine.Random.Range(0, 2) == 0)
-                    {
-                        leftRoad = true;
-                    }
-                    else
-                    {
-                        bottomRoad = true;
-                    }
-                }
-
-
-                bool rightRoad = UnityEngine.Random.Range(0, 2) == 0;
-
-                bool topRoad = UnityEngine.Random.Range(0, 2) == 0;
-
-
-                if (leftRoad)
-                {
-                    if (!previousX)
-                    {
-                        _connections.TryAdd(new Vector2Int(x - 1, z), new ConnectionData(x - 1, z, ConnectionType.Road));
-                    }
-                    else
-                    {
-                        left.Type = ConnectionType.Road;
-                    }
-                }
-                else if (!previousX)
-                {
-                    _connections.TryAdd(new Vector2Int(x - 1, z), new ConnectionData(x - 1, z, ConnectionType.Grass));
-                }
-
-                if (bottomRoad)
-                {
-                    if (!previousZ)
-                    {
-                        _connections.TryAdd(new Vector2Int(x, z - 1), new ConnectionData(x, z - 1, ConnectionType.Road));
-                    }
-                    else
-                    {
-                        bottom.Type = ConnectionType.Road;
-                    }
-                }
-                else if (!previousZ)
-                {
-                    _connections.TryAdd(new Vector2Int(x, z - 1), new ConnectionData(x, z - 1, ConnectionType.Grass));
-                }
-
-                if (rightRoad)
-                {
-                    _connections.TryAdd(new Vector2Int(x + 1, z), new ConnectionData(x + 1, z, ConnectionType.Road));
-                }
-                else
-                {
-                    _connections.TryAdd(new Vector2Int(x + 1, z), new ConnectionData(x + 1, z, ConnectionType.Grass));
-                }
-
-                if (topRoad)
-                {
-                    _connections.TryAdd(new Vector2Int(x, z + 1), new ConnectionData(x, z + 1, ConnectionType.Road));
-                }
-                else
-                {
-                    _connections.TryAdd(new Vector2Int(x, z + 1), new ConnectionData(x, z + 1, ConnectionType.Grass));
-                }
+                AddRoad(x, z);
             }
         }
 
@@ -333,21 +272,7 @@ public class TerrainData
         {
             for (int z = -_sizeZ / 2 * 2 - 1; z <= (_sizeZ - 1) / 2 * 2 + 1; z += 2)
             {
-                bool left = _connections.TryGetValue(new Vector2Int(x - 1, z), out ConnectionData leftConnection);
-
-                bool right = _connections.TryGetValue(new Vector2Int(x + 1, z), out ConnectionData rightConnection);
-
-                bool top = _connections.TryGetValue(new Vector2Int(x, z + 1), out ConnectionData topConnection);
-
-                bool bottom = _connections.TryGetValue(new Vector2Int(x, z - 1), out ConnectionData bottomConnection);
-
-                Vector2Int pos = new Vector2Int(x, z);
-
-                _joints.Add(pos, new JoinData(pos,
-                    left && leftConnection.Type == ConnectionType.Road,
-                    right && rightConnection.Type == ConnectionType.Road,
-                    top && topConnection.Type == ConnectionType.Road,
-                    bottom && bottomConnection.Type == ConnectionType.Road));
+                AddJoint(x, z);
             }
         }
     }
@@ -359,7 +284,141 @@ public class TerrainData
         if (resize)
         {
             Resize();
-        } 
+        }
+    }
+
+    private void AddRoad(int positionX, int positionZ)
+    {
+        bool previousX = _connections.TryGetValue(new Vector2Int(positionX - 1, positionZ), out ConnectionData left);
+
+        bool previousZ = _connections.TryGetValue(new Vector2Int(positionX, positionZ - 1), out ConnectionData bottom);
+
+        bool nextX = _connections.TryGetValue(new Vector2Int(positionX + 1, positionZ), out ConnectionData right);
+
+        bool nextZ = _connections.TryGetValue(new Vector2Int(positionX, positionZ + 1), out ConnectionData top);
+
+
+        bool leftRoad = UnityEngine.Random.Range(0, 2) == 0;
+
+        bool bottomRoad = UnityEngine.Random.Range(0, 2) == 0;
+
+
+        if (!leftRoad && !bottomRoad)
+        {
+            if (UnityEngine.Random.Range(0, 2) == 0)
+            {
+                leftRoad = true;
+            }
+            else
+            {
+                bottomRoad = true;
+            }
+        }
+
+
+        bool rightRoad = UnityEngine.Random.Range(0, 2) == 0;
+
+        bool topRoad = UnityEngine.Random.Range(0, 2) == 0;
+
+
+        if (leftRoad)
+        {
+            if (!previousX)
+            {
+                _connections.TryAdd(new Vector2Int(positionX - 1, positionZ), new ConnectionData(positionX - 1, positionZ, ConnectionType.Road));
+            }
+            else
+            {
+                left.Type = ConnectionType.Road;
+            }
+        }
+        else if (!previousX)
+        {
+            _connections.TryAdd(new Vector2Int(positionX - 1, positionZ), new ConnectionData(positionX - 1, positionZ, ConnectionType.Grass));
+        }
+
+        if (bottomRoad)
+        {
+            if (!previousZ)
+            {
+                _connections.TryAdd(new Vector2Int(positionX, positionZ - 1), new ConnectionData(positionX, positionZ - 1, ConnectionType.Road));
+            }
+            else
+            {
+                bottom.Type = ConnectionType.Road;
+            }
+        }
+        else if (!previousZ)
+        {
+            _connections.TryAdd(new Vector2Int(positionX, positionZ - 1), new ConnectionData(positionX, positionZ - 1, ConnectionType.Grass));
+        }
+
+        if (rightRoad)
+        {
+            if (!nextX)
+            {
+                _connections.TryAdd(new Vector2Int(positionX + 1, positionZ), new ConnectionData(positionX + 1, positionZ, ConnectionType.Road));
+            }
+            else
+            {
+                right.Type = ConnectionType.Road;
+            }
+        }
+        else
+        {
+            _connections.TryAdd(new Vector2Int(positionX + 1, positionZ), new ConnectionData(positionX + 1, positionZ, ConnectionType.Grass));
+        }
+
+        if (topRoad)
+        {
+            if (!nextZ)
+            {
+                _connections.TryAdd(new Vector2Int(positionX, positionZ + 1), new ConnectionData(positionX, positionZ + 1, ConnectionType.Road));
+            }
+            else
+            {
+                top.Type = ConnectionType.Road;
+            }
+        }
+        else
+        {
+            _connections.TryAdd(new Vector2Int(positionX, positionZ + 1), new ConnectionData(positionX, positionZ + 1, ConnectionType.Grass));
+        }
+    }
+
+    private void AddJoint(int positionX, int positionZ)
+    {
+        bool left = _connections.TryGetValue(new Vector2Int(positionX - 1, positionZ), out ConnectionData leftConnection);
+
+        bool right = _connections.TryGetValue(new Vector2Int(positionX + 1, positionZ), out ConnectionData rightConnection);
+
+        bool top = _connections.TryGetValue(new Vector2Int(positionX, positionZ + 1), out ConnectionData topConnection);
+
+        bool bottom = _connections.TryGetValue(new Vector2Int(positionX, positionZ - 1), out ConnectionData bottomConnection);
+
+
+        Vector2Int pos = new Vector2Int(positionX, positionZ);
+
+
+        left = left && leftConnection.Type == ConnectionType.Road;
+
+        right = right && rightConnection.Type == ConnectionType.Road;
+
+        top = top && topConnection.Type == ConnectionType.Road;
+
+        bottom = bottom && bottomConnection.Type == ConnectionType.Road;
+
+
+        if (!_joints.TryAdd(pos, new JoinData(pos, left, right, top, bottom)))
+        {
+            _joints[pos].Left = left;
+
+            _joints[pos].Right = right;
+
+            _joints[pos].Top = top;
+
+            _joints[pos].Bottom = bottom;
+        }
     }
 
     private void Resize()
