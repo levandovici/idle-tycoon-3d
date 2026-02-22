@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class TerrainController : MonoBehaviour
@@ -53,18 +54,14 @@ public class TerrainController : MonoBehaviour
         _terrainData = terrain;
 
         Generate();
+
+        GenerateSale();
     }
 
 
 
     private void Generate()
     {
-        _terrain = new Dictionary<Vector2Int, GameObject>();
-
-        
-        _terrainData = new TerrainData(3, 3);
-
-
         CellData[] cells = _terrainData.Cells;
 
         for (int i = 0; i < cells.Length; i++)
@@ -226,6 +223,155 @@ public class TerrainController : MonoBehaviour
         }
     }
 
+    private void GenerateSale()
+    {
+        CellData[] cells = _terrainData.Cells;
+
+
+        List<Vector2Int> leftCells = new List<Vector2Int>();
+
+        List<Vector2Int> rightCells = new List<Vector2Int>();
+
+        List<Vector2Int> topCells = new List<Vector2Int>();
+
+        List<Vector2Int> bottomCells = new List<Vector2Int>();
+
+
+        int minX = _terrainData.MinX;
+
+        int maxX = _terrainData.MaxX;
+
+        int minZ = _terrainData.MinZ;
+
+        int maxZ = _terrainData.MaxZ;
+
+
+
+        void ProcessBottom(int z)
+        {
+            for (int x = minX; x <= maxX; x += 2)
+            {
+                if (!_terrainData.ContainsCell(x, z, out CellData cell))
+                {
+                    bottomCells.Add(new Vector2Int(x, z));
+                }
+            }
+        }
+
+        void ProcessTop(int z)
+        {
+            for (int x = minX; x <= maxX; x += 2)
+            {
+                if (!_terrainData.ContainsCell(x, z, out CellData cell))
+                {
+                    topCells.Add(new Vector2Int(x, z));
+                }
+            }
+        }
+
+        void ProcessLeft(int x)
+        {
+            for (int z = minZ; z <= maxZ; z += 2)
+            {
+                if (!_terrainData.ContainsCell(x, z, out CellData cell))
+                {
+                    leftCells.Add(new Vector2Int(x, z));
+                }
+            }
+        }
+
+        void ProcessRight(int x)
+        {
+            for (int z = minZ; z <= maxZ; z += 2)
+            {
+                if (!_terrainData.ContainsCell(x, z, out CellData cell))
+                {
+                    rightCells.Add(new Vector2Int(x, z));
+                }
+            }
+        }
+
+
+        void ProcessHorizontal()
+        {
+            ProcessBottom(minZ);
+
+            ProcessTop(maxZ);
+
+
+            if (topCells.Count > 0)
+            {
+                maxZ -= 2;
+            }
+            else
+            {
+                ProcessTop(maxZ + 2);
+            }
+
+            if (bottomCells.Count > 0)
+            {
+                minZ += 2;
+            }
+            else
+            {
+                ProcessBottom(minZ - 2);
+            }
+        }
+
+        void ProcessVertical()
+        {
+            ProcessLeft(minX);
+
+            ProcessRight(maxX);
+
+
+            if (leftCells.Count > 0)
+            {
+                minX += 2;
+            }
+            else
+            {
+                ProcessLeft(minX - 2);
+            }
+
+            if (rightCells.Count > 0)
+            {
+                maxX -= 2;
+            }
+            else
+            {
+                ProcessRight(maxX + 2);
+            }
+        }
+
+
+
+        if (_terrainData.SizeX > _terrainData.SizeZ)
+        {
+            ProcessVertical();
+
+            ProcessHorizontal();
+        }
+        else
+        {
+            ProcessHorizontal();
+
+            ProcessVertical();
+        }
+
+
+        IEnumerable<Vector2Int> list = leftCells.Concat(rightCells).Concat(bottomCells).Concat(topCells)
+
+        foreach (Vector2Int position in list)
+        {
+            Vector3 pos = new Vector3(position.x / 2 * _cellSize + position.x / 2 * _connectionSize,
+                0f, position.y / 2 * _cellSize + position.y / 2 * _connectionSize);
+
+            GameObject obj = Instantiate(_cellAdd, pos, Quaternion.identity);
+
+            _terrain.Add(position, obj);
+        }
+    }
 
 
     [ContextMenu("Generate Random")]
@@ -235,6 +381,8 @@ public class TerrainController : MonoBehaviour
         {
             Destroy(o);
         }
+
+        _terrain = new Dictionary<Vector2Int, GameObject>();
 
         _terrainData = new TerrainData(3, 3);
 

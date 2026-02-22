@@ -11,7 +11,7 @@ public class GameplaySceneManager : MonoBehaviour
     private TerrainController _terrain;
 
     [SerializeField]
-    private Cell _hovered = null;
+    private CellBase _hovered = null;
 
 
 
@@ -47,16 +47,18 @@ public class GameplaySceneManager : MonoBehaviour
             {
                 if (_hovered != null)
                 {
-                    _hovered.Selection.Unselect();
+                    _hovered.Unselect();
                 }
 
-                _hovered = objectHit.GetComponent<Cell>();
+                _hovered = objectHit.GetComponent<CellBase>();
 
-                _hovered.Selection.Select();
+                _hovered.Select();
             }
             else if(_hovered != null)
             {
-                _hovered.Selection.Unselect();
+                _hovered.Unselect();
+
+                _hovered = null;
             }
         }
     }

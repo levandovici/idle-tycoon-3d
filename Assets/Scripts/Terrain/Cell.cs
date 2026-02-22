@@ -2,13 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cell : MonoBehaviour
+public class Cell : CellBase
 {
     [SerializeField]
     private CellData _data;
-
-    [SerializeField]
-    private Selection _selection;
 
 
 
@@ -22,14 +19,6 @@ public class Cell : MonoBehaviour
         private set
         {
             _data = value;
-        }
-    }
-
-    public Selection Selection
-    {
-        get
-        {
-            return _selection;
         }
     }
 

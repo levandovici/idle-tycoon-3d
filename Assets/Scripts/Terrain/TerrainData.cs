@@ -4,6 +4,8 @@ using UnityEngine;
 using System;
 using JetBrains.Annotations;
 using System.Linq;
+using System.Xml.Schema;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 
 [Serializable]
 public class TerrainData
@@ -13,6 +15,18 @@ public class TerrainData
 
     [SerializeField]
     private int _sizeZ = 3;
+
+    [SerializeField]
+    private int _minX = -2;
+
+    [SerializeField]
+    private int _maxX = 2;
+
+    [SerializeField]
+    private int _minZ = -2;
+
+    [SerializeField]
+    private int _maxZ = 2;
 
     [SerializeField]
     private int _maxSizeX = 32;
@@ -36,6 +50,11 @@ public class TerrainData
         {
             return _sizeX;
         }
+
+        private set
+        {
+            _sizeX = value;
+        }
     }
 
     public int SizeZ
@@ -43,6 +62,89 @@ public class TerrainData
         get
         {
             return _sizeZ;
+        }
+
+        private set
+        {
+            _sizeZ = value;
+        }
+    }
+
+    public int MinX
+    {
+        get
+        {
+            return _minX;
+        }
+
+        private set
+        {
+            _minX = value;
+        }
+    }
+
+    public int MaxX
+    {
+        get
+        {
+            return _maxX;
+        }
+
+        private set
+        {
+            _maxX = value;
+        }
+    }
+
+    public int MinZ
+    {
+        get
+        {
+            return _minZ;
+        }
+
+        private set
+        {
+            _minZ = value;
+        }
+    }
+
+    public int MaxZ
+    {
+        get
+        {
+            return _maxZ;
+        }
+
+        private set
+        {
+            _maxZ = value;
+        }
+    }
+
+    public int MaxSizeX
+    {
+        get
+        {
+            return _maxSizeX;
+        }
+
+        private set
+        {
+            _maxSizeX = value;
+        }
+    }
+
+    public int MaxSizeZ
+    {
+        get
+        {
+            return _maxSizeZ;
+        }
+
+        private set
+        {
+            _maxSizeZ = value;
         }
     }
 
@@ -80,15 +182,47 @@ public class TerrainData
 
     public TerrainData(int sizeX, int sizeZ, int maxSizeX, int maxSizeZ)
     {
-        _sizeX = sizeX;
+        SizeX = sizeX;
 
-        _sizeZ = sizeZ;
+        SizeZ = sizeZ;
 
-        _maxSizeX = maxSizeX;
 
-        _maxSizeZ = maxSizeZ;
+        MinX = -sizeX / 2 * 2;
+
+        MaxX = (sizeX - 1) / 2 * 2;
+
+        MinZ = -sizeZ / 2 * 2;
+
+        MaxZ = (sizeZ - 1) / 2 * 2;
+
+
+        MaxSizeX = maxSizeX;
+
+        MaxSizeZ = maxSizeZ;
+
 
         Generate();
+    }
+
+
+
+    public bool ContainsCell(int positionX, int positionZ, out CellData cell)
+    {
+        return ContainsCell(new Vector2Int(positionX, positionZ), out cell);
+    }
+
+    public bool ContainsCell(Vector2Int position, out CellData cell)
+    {
+        bool exists = _cells.ContainsKey(position);
+
+        if (!exists)
+        {
+            cell = null;
+
+            return false;
+        }
+
+        return _cells.TryGetValue(position, out cell);
     }
 
 
@@ -103,15 +237,15 @@ public class TerrainData
 
                 int cellZ = (z - _sizeZ / 2) * 2;
 
-                _cells.Add(new Vector2Int(cellX, cellZ), new CellData(cellX, cellZ));
+                AddCell(cellX, cellZ);
 
                 Debug.Log($"Cell: {cellX} : {cellZ}");
             }
         }
 
-        for(int x = -_sizeX / 2 * 2; x <= _sizeX / 2 * 2; x += 2)
+        for (int x = -_sizeX / 2 * 2; x <= (_sizeX - 1) / 2 * 2; x += 2)
         {
-            for (int z = -_sizeZ / 2 * 2; z <= _sizeZ / 2 * 2; z += 2)
+            for (int z = -_sizeZ / 2 * 2; z <= (_sizeZ - 1) / 2 * 2; z += 2)
             {
                 Debug.Log($"{x} : {z}");
 
@@ -143,7 +277,7 @@ public class TerrainData
                 bool topRoad = UnityEngine.Random.Range(0, 2) == 0;
 
 
-                if(leftRoad)
+                if (leftRoad)
                 {
                     if (!previousX)
                     {
@@ -154,7 +288,7 @@ public class TerrainData
                         left.Type = ConnectionType.Road;
                     }
                 }
-                else if(!previousX)
+                else if (!previousX)
                 {
                     _connections.TryAdd(new Vector2Int(x - 1, z), new ConnectionData(x - 1, z, ConnectionType.Grass));
                 }
@@ -170,7 +304,7 @@ public class TerrainData
                         bottom.Type = ConnectionType.Road;
                     }
                 }
-                else if(!previousZ)
+                else if (!previousZ)
                 {
                     _connections.TryAdd(new Vector2Int(x, z - 1), new ConnectionData(x, z - 1, ConnectionType.Grass));
                 }
@@ -195,26 +329,80 @@ public class TerrainData
             }
         }
 
-        for(int x = -_sizeX / 2 * 2 - 1; x <= _sizeX / 2 * 2 + 1; x += 2)
+        for (int x = -_sizeX / 2 * 2 - 1; x <= (_sizeX - 1) / 2 * 2 + 1; x += 2)
         {
-            for (int z = -_sizeZ / 2 * 2 - 1; z <= _sizeZ / 2 * 2 + 1; z += 2)
+            for (int z = -_sizeZ / 2 * 2 - 1; z <= (_sizeZ - 1) / 2 * 2 + 1; z += 2)
             {
-                    bool left = _connections.TryGetValue(new Vector2Int(x - 1, z), out ConnectionData leftConnection);
+                bool left = _connections.TryGetValue(new Vector2Int(x - 1, z), out ConnectionData leftConnection);
 
-                    bool right = _connections.TryGetValue(new Vector2Int(x + 1, z), out ConnectionData rightConnection);
+                bool right = _connections.TryGetValue(new Vector2Int(x + 1, z), out ConnectionData rightConnection);
 
-                    bool top = _connections.TryGetValue(new Vector2Int(x, z + 1), out ConnectionData topConnection);
+                bool top = _connections.TryGetValue(new Vector2Int(x, z + 1), out ConnectionData topConnection);
 
-                    bool bottom = _connections.TryGetValue(new Vector2Int(x, z - 1), out ConnectionData bottomConnection);
+                bool bottom = _connections.TryGetValue(new Vector2Int(x, z - 1), out ConnectionData bottomConnection);
 
-                    Vector2Int pos = new Vector2Int(x, z);
+                Vector2Int pos = new Vector2Int(x, z);
 
-                    _joints.Add(pos, new JoinData(pos,
-                        left && leftConnection.Type == ConnectionType.Road,
-                        right && rightConnection.Type == ConnectionType.Road,
-                        top && topConnection.Type == ConnectionType.Road,
-                        bottom && bottomConnection.Type == ConnectionType.Road));
+                _joints.Add(pos, new JoinData(pos,
+                    left && leftConnection.Type == ConnectionType.Road,
+                    right && rightConnection.Type == ConnectionType.Road,
+                    top && topConnection.Type == ConnectionType.Road,
+                    bottom && bottomConnection.Type == ConnectionType.Road));
             }
         }
+    }
+
+    private void AddCell(int positionX, int positionZ, bool resize = false)
+    {
+        _cells.Add(new Vector2Int(positionX, positionZ), new CellData(positionX, positionZ));
+
+        if (resize)
+        {
+            Resize();
+        } 
+    }
+
+    private void Resize()
+    {
+        int xMin = int.MaxValue;
+
+        int xMax = int.MinValue;
+
+        int zMin = int.MaxValue;
+
+        int zMax = int.MinValue;
+
+        foreach (CellData cell in _cells.Values)
+        {
+            if (cell.Position.x < xMin)
+            {
+                xMin = cell.Position.x;
+            }
+            else if (cell.Position.x > xMax)
+            {
+                xMax = cell.Position.x;
+            }
+
+            if (cell.Position.y < zMin)
+            {
+                zMin = cell.Position.y;
+            }
+            else if (cell.Position.y > zMax)
+            {
+                zMax = cell.Position.y;
+            }
+        }
+
+        SizeX = (Mathf.Abs(xMin) + xMax) / 2 + 1;
+
+        SizeZ = (Mathf.Abs(zMin) + zMax) / 2 + 1;
+
+        MinX = xMin;
+
+        MaxX = xMax;
+
+        MinZ = zMin;
+
+        MaxZ = zMax;
     }
 }

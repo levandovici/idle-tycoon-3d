@@ -169,9 +169,15 @@ MonoBehaviour:
   _terrainData:
     _sizeX: 0
     _sizeZ: 0
+    _minX: 0
+    _maxX: 0
+    _minZ: 0
+    _maxZ: 0
     _maxSizeX: 0
     _maxSizeZ: 0
   _cell: {fileID: 2525168734458169471, guid: 9e1736849f0eb22448d373e02fb08adc, type: 3}
+  _cellAdd: {fileID: 6862365567286207184, guid: 2f45e2627fc46534690eb8141caee98c,
+    type: 3}
   _roadConnection: {fileID: 7442646037511173596, guid: 14c5477e4421dce41914bd01c56b6362,
     type: 3}
   _grassConnection: {fileID: 6887135682562178647, guid: 2014d616323ccbf45b6e18b06cdfc479,
@@ -2204,6 +2210,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _uiManager: {fileID: 1672588534}
   _terrain: {fileID: 134233418}
+  _hovered: {fileID: 0}
 --- !u!1 &1771527460
 GameObject:
   m_ObjectHideFlags: 0
