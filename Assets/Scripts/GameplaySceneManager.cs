@@ -19,9 +19,7 @@ public class GameplaySceneManager : MonoBehaviour
     {
         SaveLoadManager.Load();
 
-        _uiManager.Resources.Setup(SaveLoadManager.Data.Containers, SaveLoadManager.Data.Planks,
-            SaveLoadManager.Data.Bricks, SaveLoadManager.Data.Money,
-            SaveLoadManager.Data.Gold, SaveLoadManager.Data.Diamonds);
+        RefreshResources();
 
         _terrain.Setup(SaveLoadManager.Data.Terrain);
     }
@@ -35,6 +33,15 @@ public class GameplaySceneManager : MonoBehaviour
 
         Hover();
     }
+
+
+
+    private void RefreshResources()
+    {
+        _uiManager.Resources.Setup(SaveLoadManager.Data.Resources);
+    }
+
+
 
     private void Click()
     {
@@ -52,7 +59,12 @@ public class GameplaySceneManager : MonoBehaviour
             {
                 CellAdd cell = objectHit.GetComponent<CellAdd>();
 
-                _terrain.AddNewCell(cell.Position);
+                if (SaveLoadManager.Data.TryPay(new Price(gold: 5)))
+                {
+                    _terrain.AddNewCell(cell.Position);
+
+                    RefreshResources();
+                }
             }
         }
     }
@@ -69,23 +81,55 @@ public class GameplaySceneManager : MonoBehaviour
 
             Debug.Log(objectHit);
 
-            if (objectHit.tag == "Cell" || objectHit.tag == "CellAdd")
+            if (objectHit.tag == "Cell")
             {
-                if (_hovered != null)
-                {
-                    _hovered.Unselect();
-                }
-
-                _hovered = objectHit.GetComponent<CellBase>();
-
-                _hovered.Select();
+                HoverCell(objectHit, objectHit.name);
+            }
+            else if(objectHit.tag == "CellAdd")
+            {
+                HoverCell(objectHit, $"New Terrain", new Price(gold:5));
             }
             else if (_hovered != null)
             {
                 _hovered.Unselect();
 
                 _hovered = null;
+
+                _uiManager.ShortInfo.Close();
             }
+        }
+        else if (_hovered != null)
+        {
+            _hovered.Unselect();
+
+            _hovered = null;
+
+            _uiManager.ShortInfo.Close();
+        }
+
+        void HoverCell(Transform objectHit, string information, Price price = null)
+        {
+            if (_hovered != null)
+            {
+                _hovered.Unselect();
+
+                _uiManager.ShortInfo.Close();
+            }
+
+            _hovered = objectHit.GetComponent<CellBase>();
+
+            _hovered.Select();
+
+            if (price == null)
+            {
+                _uiManager.ShortInfo.Setup(information);
+            }
+            else
+            {
+                _uiManager.ShortInfo.Setup(information, price);
+            }
+
+            _uiManager.ShortInfo.Open();
         }
     }
 }

@@ -8,38 +8,36 @@ using UnityEngine;
 public class PlayerData
 {
     [SerializeField]
-    private int _containers = 0;
-
-    [SerializeField]
-    private int _planks = 0;
-
-    [SerializeField]
-    private int _bricks = 0;
-
-    [SerializeField]
-    private int _money = 0;
-
-    [SerializeField]
-    private int _gold = 0;
-
-    [SerializeField]
-    private int _diamonds = 0;
+    private Price _resources;
 
     [SerializeField]
     private TerrainData _terrain = new TerrainData(3, 3);
 
 
 
+    public Price Resources
+    {
+        get
+        {
+            return _resources;
+        }
+
+        private set
+        {
+            _resources = value;
+        }
+    }
+
     public int Containers
     {
         get
         {
-            return _containers;
+            return _resources.Containers;
         }
 
         set
         {
-            _containers = value;
+            _resources.Containers = value;
         }
     }
 
@@ -47,12 +45,12 @@ public class PlayerData
     {
         get
         {
-            return _planks;
+            return _resources.Planks;
         }
 
         set
         {
-            _planks = value;
+            _resources.Planks = value;
         }
     }
 
@@ -60,12 +58,12 @@ public class PlayerData
     {
         get
         {
-            return _bricks;
+            return _resources.Bricks;
         }
 
         set
         {
-            _bricks = value;
+            _resources.Bricks = value;
         }
     }
 
@@ -73,12 +71,12 @@ public class PlayerData
     {
         get
         {
-            return _money;
+            return _resources.Money;
         }
 
         set
         {
-            _money = value;
+            _resources.Money = value;
         }
     }
 
@@ -86,12 +84,12 @@ public class PlayerData
     {
         get
         {
-            return _gold;
+            return _resources.Gold;
         }
 
         set
         {
-            _gold = value;
+            _resources.Gold = value;
         }
     }
 
@@ -99,12 +97,12 @@ public class PlayerData
     {
         get
         {
-            return _diamonds;
+            return _resources.Diamonds;
         }
 
         set
         {
-            _diamonds = value;
+            _resources.Diamonds = value;
         }
     }
 
@@ -136,18 +134,22 @@ public class PlayerData
 
     public PlayerData(int containers, int planks, int bricks, int money, int gold, int diamonds, TerrainData terrain)
     {
-        Containers = containers;
-
-        Planks = planks;
-
-        Bricks = bricks;
-
-        Money = money;
-
-        Gold = gold;
-
-        Diamonds = diamonds;
+        Resources = new Price(containers, planks, bricks, money, gold, diamonds);
 
         Terrain = terrain;
+    }
+
+
+
+    public bool TryPay(Price price)
+    {
+        if(_resources >= price)
+        {
+            _resources -= price;
+
+            return true;
+        }
+
+        return false;
     }
 }

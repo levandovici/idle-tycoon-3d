@@ -26,19 +26,19 @@ public class ResourcesPanel : UIPanel
 
 
 
-    public void Setup(int containers, int planks, int bricks, int money, int gold, int diamonds)
+    public void Setup(Price price)
     {
-        _containers.text = $"{containers}";
+        _containers.text = $"{price.Containers}";
 
-        _planks.text = $"{planks}";
+        _planks.text = $"{price.Planks}";
 
-        _bricks.text = $"{bricks}";
+        _bricks.text = $"{price.Bricks}";
 
-        _money.text = $"{money}";
+        _money.text = $"{price.Money}";
 
-        _gold.text = $"{gold}";
+        _gold.text = $"{price.Gold}";
 
-        _diamonds.text = $"{diamonds}";
+        _diamonds.text = $"{price.Diamonds}";
     }
 
 
