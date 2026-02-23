@@ -35,12 +35,24 @@ public class TerrainData
     [SerializeField]
     private int _maxSizeZ = 32;
 
+    [SerializeField]
+    private CellData[] _cellsArray = new CellData[0];
+
+    [SerializeField]
+    private ConnectionData[] _connectionsArray = new ConnectionData[0];
+
+    [SerializeField]
+    private JoinData[] _jointsArray = new JoinData[0];
 
 
+
+    [NonSerialized]
     private Dictionary<Vector2Int, CellData> _cells = new Dictionary<Vector2Int, CellData>();
 
+    [NonSerialized]
     private Dictionary<Vector2Int, ConnectionData> _connections = new Dictionary<Vector2Int, ConnectionData>();
 
+    [NonSerialized]
     private Dictionary<Vector2Int, JoinData> _joints = new Dictionary<Vector2Int, JoinData>();
 
 
@@ -176,6 +188,11 @@ public class TerrainData
 
 
 
+    public TerrainData() : this(0, 0)
+    {
+
+    }
+
     public TerrainData(int sizeX, int sizeZ) : this(sizeX, sizeZ, 32, 32)
     {
 
@@ -202,7 +219,56 @@ public class TerrainData
         MaxSizeZ = maxSizeZ;
 
 
+        _cellsArray = new CellData[0];
+
+        _connectionsArray = new ConnectionData[0];
+
+        _jointsArray = new JoinData[0];
+
+
+        _cells = new Dictionary<Vector2Int, CellData>();
+
+        _connections = new Dictionary<Vector2Int, ConnectionData>();
+
+        _joints = new Dictionary<Vector2Int, JoinData>();
+
+
         Generate();
+    }
+
+
+
+    public void Save()
+    {
+        _cellsArray = Cells;
+
+        _connectionsArray = Connections;
+
+        _jointsArray = Joints;
+    }
+
+    public void Load()
+    {
+        _cells = new Dictionary<Vector2Int, CellData>();
+
+        _connections = new Dictionary<Vector2Int, ConnectionData>();
+
+        _joints = new Dictionary<Vector2Int, JoinData>();
+
+        for (int i = 0; i < _cellsArray.Length; i++)
+        {
+            _cells.Add(_cellsArray[i].Position, _cellsArray[i]);
+        }
+
+        for (int i = 0; i < _connectionsArray.Length; i++)
+        {
+            _connections.Add(_connectionsArray[i].Position, _connectionsArray[i]);
+        }
+
+        for (int i = 0; i < _jointsArray.Length; i++)
+        {
+            _joints.Add(_jointsArray[i].Position, _jointsArray[i]);
+        }
     }
 
 
@@ -305,6 +371,8 @@ public class TerrainData
 
     private void AddRoad(int positionX, int positionZ)
     {
+        System.Random random = new System.Random();
+
         bool previousX = _connections.TryGetValue(new Vector2Int(positionX - 1, positionZ), out ConnectionData left);
 
         bool previousZ = _connections.TryGetValue(new Vector2Int(positionX, positionZ - 1), out ConnectionData bottom);
@@ -314,14 +382,14 @@ public class TerrainData
         bool nextZ = _connections.TryGetValue(new Vector2Int(positionX, positionZ + 1), out ConnectionData top);
 
 
-        bool leftRoad = UnityEngine.Random.Range(0, 2) == 0;
+        bool leftRoad = random.Next(2) == 0;
 
-        bool bottomRoad = UnityEngine.Random.Range(0, 2) == 0;
+        bool bottomRoad = random.Next(2) == 0;
 
 
         if (!leftRoad && !bottomRoad)
         {
-            if (UnityEngine.Random.Range(0, 2) == 0)
+            if (random.Next(2) == 0)
             {
                 leftRoad = true;
             }
@@ -332,9 +400,9 @@ public class TerrainData
         }
 
 
-        bool rightRoad = UnityEngine.Random.Range(0, 2) == 0;
+        bool rightRoad = random.Next(2) == 0;
 
-        bool topRoad = UnityEngine.Random.Range(0, 2) == 0;
+        bool topRoad = random.Next(2) == 0;
 
 
         if (leftRoad)

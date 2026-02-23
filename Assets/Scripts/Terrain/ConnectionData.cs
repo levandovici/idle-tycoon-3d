@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.AI;
 
+[Serializable]
 public class ConnectionData
 {
     [SerializeField]
@@ -18,6 +20,11 @@ public class ConnectionData
         get
         {
             return _position;
+        }
+
+        private set
+        {
+            _position = value;
         }
     }
 
@@ -35,6 +42,11 @@ public class ConnectionData
     }
 
 
+
+    public ConnectionData() : this(0, 0, ConnectionType.None)
+    {
+
+    }
 
     public ConnectionData(int positionX, int positionZ, ConnectionType type) : this(new Vector2Int(positionX, positionZ), type)
     {

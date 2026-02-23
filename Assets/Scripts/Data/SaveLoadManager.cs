@@ -33,6 +33,8 @@ public static class SaveLoadManager
         string path = Path.Combine(Application.persistentDataPath, _path);
 #endif
 
+        _data.Terrain.Save();
+
         string json = JsonUtility.ToJson(_data, true);
 
         File.WriteAllText(path, json);
@@ -51,6 +53,8 @@ public static class SaveLoadManager
             string json = File.ReadAllText(path);
 
             _data = JsonUtility.FromJson<PlayerData>(json);
+
+            _data.Terrain.Load();
         }
         catch(Exception e)
         {

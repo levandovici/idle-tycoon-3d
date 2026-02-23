@@ -58,6 +58,11 @@ public class CellData
 
 
 
+    public CellData() : this(0, 0)
+    {
+
+    }
+
     public CellData(int positionX, int positionZ) : this(new Vector2Int(positionX, positionZ))
     {
 

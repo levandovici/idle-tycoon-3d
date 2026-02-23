@@ -394,4 +394,12 @@ public class GameplaySceneManager : MonoBehaviour
                 throw new NotImplementedException();
         }
     }
+
+
+
+    [ContextMenu("Save")]
+    private void Save()
+    {
+        SaveLoadManager.Save();
+    }
 }

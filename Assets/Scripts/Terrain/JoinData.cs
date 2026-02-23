@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class JoinData
 {
     [SerializeField]
@@ -17,6 +19,11 @@ public class JoinData
         get
         {
             return _position;
+        }
+
+        private set
+        {
+            _position = value;
         }
     }
 
@@ -117,6 +124,11 @@ public class JoinData
     }
 
 
+
+    public JoinData() : this(0, 0, false, false, false, false)
+    {
+
+    }
 
     public JoinData(int positionX, int positionZ, bool left, bool right, bool top, bool bottom) : 
         this(new Vector2Int(positionX, positionZ), left, right, top, bottom)
