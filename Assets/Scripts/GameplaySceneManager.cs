@@ -19,11 +19,16 @@ public class GameplaySceneManager : MonoBehaviour
     [SerializeField]
     private Cell _selected = null;
 
+    [SerializeField]
+    private Price _resources = null;
+
 
 
     private void Awake()
     {
         SaveLoadManager.Load();
+
+        _resources = SaveLoadManager.Data.Resources.Clone();
 
         RefreshResources();
 
@@ -38,6 +43,13 @@ public class GameplaySceneManager : MonoBehaviour
         }
 
         Hover();
+
+        if(SaveLoadManager.Data.Resources != _resources)
+        {
+            _resources = SaveLoadManager.Data.Resources.Clone();
+
+            RefreshResources();
+        }
     }
 
 
@@ -110,12 +122,12 @@ public class GameplaySceneManager : MonoBehaviour
             case EBuilding.Factory:
                 if (CanUpgrade(EBuilding.Factory, cell.Data.Level, out Price factoryPrice))
                 {
-                    _uiManager.Information.Setup($"Factory [Level {cell.Data.Level}]", factoryPrice, 
+                    _uiManager.Information.Setup($"Factory\n[Level {cell.Data.Level}]", factoryPrice, 
                         new OptionSetup("Upgrade Factory", () => UpgradeEvent(cell.Data.Position, factoryPrice)));
                 }
                 else
                 {
-                    _uiManager.Information.Setup($"Factory [Max Level {cell.Data.Level}]");
+                    _uiManager.Information.Setup($"Factory\n[Max Level {cell.Data.Level}]");
                 }
 
                 break;
@@ -123,12 +135,12 @@ public class GameplaySceneManager : MonoBehaviour
             case EBuilding.House:
                 if (CanUpgrade(EBuilding.House, cell.Data.Level, out Price housePrice))
                 {
-                    _uiManager.Information.Setup($"House [Level {cell.Data.Level}]", housePrice,
+                    _uiManager.Information.Setup($"House\n[Level {cell.Data.Level}]", housePrice,
                         new OptionSetup("Upgrade House", () => UpgradeEvent(cell.Data.Position, housePrice)));
                 }
                 else
                 {
-                    _uiManager.Information.Setup($"House [Max Level {cell.Data.Level}]");
+                    _uiManager.Information.Setup($"House\n[Max Level {cell.Data.Level}]");
                 }
 
                 break;
@@ -136,12 +148,12 @@ public class GameplaySceneManager : MonoBehaviour
             case EBuilding.Production:
                 if (CanUpgrade(EBuilding.Production, cell.Data.Level, out Price productionPrice))
                 {
-                    _uiManager.Information.Setup($"Production [Level {cell.Data.Level}]", productionPrice,
+                    _uiManager.Information.Setup($"Production\n[Level {cell.Data.Level}]", productionPrice,
                         new OptionSetup("Upgrade Production", () => UpgradeEvent(cell.Data.Position, productionPrice)));
                 }
                 else
                 {
-                    _uiManager.Information.Setup($"Production [Max Level {cell.Data.Level}]");
+                    _uiManager.Information.Setup($"Production\n[Max Level {cell.Data.Level}]");
                 }
 
                 break;
@@ -149,12 +161,12 @@ public class GameplaySceneManager : MonoBehaviour
             case EBuilding.Warehouse:
                 if (CanUpgrade(EBuilding.Warehouse, cell.Data.Level, out Price warehousePrice))
                 {
-                    _uiManager.Information.Setup($"Warehouse [Level {cell.Data.Level}]", warehousePrice,
+                    _uiManager.Information.Setup($"Warehouse\n[Level {cell.Data.Level}]", warehousePrice,
                         new OptionSetup("Upgrade Warehouse", () => UpgradeEvent(cell.Data.Position, warehousePrice)));
                 }
                 else
                 {
-                    _uiManager.Information.Setup($"Warehouse [Max Level {cell.Data.Level}]");
+                    _uiManager.Information.Setup($"Warehouse\n[Max Level {cell.Data.Level}]");
                 }
 
                 break;
@@ -213,19 +225,19 @@ public class GameplaySceneManager : MonoBehaviour
                 switch(cell.Data.Building)
                 {
                     case EBuilding.Factory:
-                        cellName = $"Factory [Level {cell.Data.Level}]";
+                        cellName = $"Factory\n[Level {cell.Data.Level}]";
                         break;
 
                     case EBuilding.House:
-                        cellName = $"House [Level {cell.Data.Level}]";
+                        cellName = $"House\n[Level {cell.Data.Level}]";
                         break;
 
                     case EBuilding.Production:
-                        cellName = $"Production [Level {cell.Data.Level}]";
+                        cellName = $"Production\n[Level {cell.Data.Level}]";
                         break;
 
                     case EBuilding.Warehouse:
-                        cellName = $"Warehouse [Level {cell.Data.Level}]";
+                        cellName = $"Warehouse\n[Level {cell.Data.Level}]";
                         break;
 
                     default:

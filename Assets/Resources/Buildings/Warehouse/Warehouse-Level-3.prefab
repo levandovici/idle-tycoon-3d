@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4599719983739325449}
+  - component: {fileID: -4318312271578672830}
   m_Layer: 0
   m_Name: Warehouse-Level-3
   m_TagString: Untagged
@@ -34,6 +35,32 @@ Transform:
   - {fileID: 2821691923024527392}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-4318312271578672830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6793780101877772302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45c2e65c55bbcd741b8f9a1a942cd16d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _production:
+    _containers: 0
+    _planks: 0
+    _bricks: 0
+    _money: 0
+    _gold: 0
+    _diamonds: 0
+  _productionDelay: 0
+  _generatedContainers: 0
+  _generatedPlanks: 0
+  _generatedBricks: 0
+  _generatedMoney: 0
+  _generatedGold: 0
+  _generatedDiamonds: 0
 --- !u!1001 &832193441999660784
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -124,6 +124,13 @@ public class Price
 
 
 
+    public Price Clone()
+    {
+        return new Price(Containers, Planks, Bricks, Money, Gold, Diamonds);
+    }
+
+
+
     public static Price operator +(Price a, Price b)
     {
         if (a is null || b is null)

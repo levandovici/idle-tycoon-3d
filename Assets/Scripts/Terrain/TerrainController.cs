@@ -376,31 +376,53 @@ public class TerrainController : MonoBehaviour
     {
         string path;
 
+        Price production;
+
+        float productionDelay;
+
         switch (building)
         {
             case EBuilding.Factory:
                 path = $"Buildings/Factory/Factory-Level-{level}";
+
+                production = Balance.Factory.Production(level);
+
+                productionDelay = Balance.Factory.ProductionDelay(level);
                 break;
 
             case EBuilding.House:
                 path = $"Buildings/House/House-Level-{level}";
+
+                production = Balance.House.Production(level);
+
+                productionDelay = Balance.House.ProductionDelay(level);
                 break;
 
             case EBuilding.Production:
                 path = $"Buildings/Production/Production-Level-{level}";
+
+                production = Balance.Production.Production(level);
+
+                productionDelay = Balance.Production.ProductionDelay(level);
                 break;
 
             case EBuilding.Warehouse:
                 path = $"Buildings/Warehouse/Warehouse-Level-{level}";
+
+                production = Balance.Warehouse.Production(level);
+
+                productionDelay = Balance.Warehouse.ProductionDelay(level);
                 break;
 
             default:
                 throw new NotImplementedException();
         }
 
-        GameObject prefab = Resources.Load<GameObject>(path);
+        Building prefab = Resources.Load<Building>(path);
 
-        GameObject obj = Instantiate(prefab, position, Quaternion.identity, cell);
+        Building build = Instantiate(prefab, position, Quaternion.identity, cell);
+
+        build.Setup(production, productionDelay);
 
         Resources.UnloadUnusedAssets();
     }
