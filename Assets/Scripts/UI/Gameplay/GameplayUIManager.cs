@@ -10,6 +10,9 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField]
     private ShortInfoPanel _shortInfo;
 
+    [SerializeField]
+    private InformationPanel _information;
+
 
 
     public ResourcesPanel Resources
@@ -25,6 +28,14 @@ public class GameplayUIManager : MonoBehaviour
         get
         {
             return _shortInfo;
+        }
+    }
+
+    public InformationPanel Information
+    {
+        get
+        {
+            return _information;
         }
     }
 }
