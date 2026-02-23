@@ -782,7 +782,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 0
+  m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1933,13 +1933,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
   m_LocalPosition: {x: 0, y: 150, z: -150}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3137,7 +3137,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 0
+  m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -7855,7 +7855,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _resources: {fileID: 2005265698}
   _shortInfo: {fileID: 86015596}
-  _information: {fileID: 0}
+  _information: {fileID: 1719351686}
 --- !u!114 &1672588535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7871,6 +7871,7 @@ MonoBehaviour:
   _uiManager: {fileID: 1672588534}
   _terrain: {fileID: 1672588536}
   _hovered: {fileID: 0}
+  _selected: {fileID: 0}
 --- !u!114 &1672588536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7892,7 +7893,7 @@ MonoBehaviour:
     _maxZ: 0
     _maxSizeX: 0
     _maxSizeZ: 0
-  _cell: {fileID: 2525168734458169471, guid: 9e1736849f0eb22448d373e02fb08adc, type: 3}
+  _cell: {fileID: 3326193355731626383, guid: 9e1736849f0eb22448d373e02fb08adc, type: 3}
   _cellAdd: {fileID: 2145312990380114726, guid: 2f45e2627fc46534690eb8141caee98c,
     type: 3}
   _roadConnection: {fileID: 7442646037511173596, guid: 14c5477e4421dce41914bd01c56b6362,

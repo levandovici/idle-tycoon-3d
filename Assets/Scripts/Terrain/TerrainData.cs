@@ -244,6 +244,22 @@ public class TerrainData
         AddJoint(position.x + 1, position.y + 1);
     }
 
+    public void BuildOnCell(Vector2Int position, EBuilding building)
+    {
+        if(ContainsCell(position, out CellData cell))
+        {
+            cell.Building = building;
+        }
+    }
+
+    public void UpgradeCell(Vector2Int position)
+    {
+        if(ContainsCell(position, out CellData cell))
+        {
+            cell.Level++;
+        }
+    }
+
 
 
     private void Generate()

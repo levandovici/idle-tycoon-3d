@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System;
 
 public class TerrainController : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class TerrainController : MonoBehaviour
     private Dictionary<Vector2Int, GameObject> _terrain = new Dictionary<Vector2Int, GameObject>();
 
     [SerializeField]
-    private GameObject _cell;
+    private Cell _cell;
 
     [SerializeField]
     private CellAdd _cellAdd;
@@ -81,7 +82,7 @@ public class TerrainController : MonoBehaviour
 
         if (_terrainData.ContainsCell(position, out CellData cell))
         {
-            GenerateCell(position);
+            GenerateCell(cell);
         }
 
 
@@ -134,6 +135,37 @@ public class TerrainController : MonoBehaviour
         GenerateSale();
     }
 
+    public void BuildOnCell(Vector2Int position, EBuilding building)
+    {
+        _terrainData.BuildOnCell(position, building);
+
+        UpdateCell(position);
+    }
+
+    public void UpgradeCell(Vector2Int position)
+    {
+        _terrainData.UpgradeCell(position);
+
+        UpdateCell(position);
+    }
+
+
+
+    private void UpdateCell(Vector2Int position)
+    {
+        if (_terrain.TryGetValue(position, out GameObject obj))
+        {
+            Destroy(obj);
+
+            _terrain.Remove(position);
+        }
+
+        if (_terrainData.ContainsCell(position, out CellData cell))
+        {
+            GenerateCell(cell);
+        }
+    }
+
 
 
     private void Generate()
@@ -142,7 +174,7 @@ public class TerrainController : MonoBehaviour
 
         for (int i = 0; i < cells.Length; i++)
         {
-            GenerateCell(cells[i].Position);
+            GenerateCell(cells[i]);
         }
 
 
@@ -323,14 +355,54 @@ public class TerrainController : MonoBehaviour
 
 
 
-    private void GenerateCell(Vector2Int position)
+    private void GenerateCell(CellData cellData)
     {
-        Vector3 pos = new Vector3(position.x / 2 * _cellSize + position.x / 2 * _connectionSize,
-                0f, position.y / 2 * _cellSize + position.y / 2 * _connectionSize);
+        Vector3 pos = new Vector3(cellData.Position.x / 2 * _cellSize + cellData.Position.x / 2 * _connectionSize,
+                0f, cellData.Position.y / 2 * _cellSize + cellData.Position.y / 2 * _connectionSize);
 
-        GameObject obj = Instantiate(_cell, pos, Quaternion.identity);
+        Cell cell = Instantiate(_cell, pos, Quaternion.identity);
 
-        _terrain.Add(position, obj);
+        cell.Setup(cellData);
+
+        _terrain.Add(cellData.Position, cell.gameObject);
+
+        if (cellData.Building != EBuilding.None)
+        {
+            GenerateBuilding(pos, cellData.Building, cellData.Level, cell.transform);
+        }
+    }
+
+    private void GenerateBuilding(Vector3 position, EBuilding building, int level, Transform cell)
+    {
+        string path;
+
+        switch (building)
+        {
+            case EBuilding.Factory:
+                path = $"Buildings/Factory/Factory-Level-{level}";
+                break;
+
+            case EBuilding.House:
+                path = $"Buildings/House/House-Level-{level}";
+                break;
+
+            case EBuilding.Production:
+                path = $"Buildings/Production/Production-Level-{level}";
+                break;
+
+            case EBuilding.Warehouse:
+                path = $"Buildings/Warehouse/Warehouse-Level-{level}";
+                break;
+
+            default:
+                throw new NotImplementedException();
+        }
+
+        GameObject prefab = Resources.Load<GameObject>(path);
+
+        GameObject obj = Instantiate(prefab, position, Quaternion.identity, cell);
+
+        Resources.UnloadUnusedAssets();
     }
 
     private void GenerateRoad(Vector2Int position, ConnectionType connectionType)

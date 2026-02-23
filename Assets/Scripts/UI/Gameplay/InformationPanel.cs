@@ -27,11 +27,18 @@ public class InformationPanel : UIPanel
         Setup(text, new Price());
     }
 
-    public void Setup(string text, Price price, OptionSetup actionSetup = null, params OptionSetup[] optionsSetup)
+    public void Setup(string text, Price price = null, OptionSetup actionSetup = null, params OptionSetup[] optionsSetup)
     {
         _information.text = text;
 
-        _price.Setup(price);
+        if (price == null)
+        {
+            _price.Setup(new Price());
+        }
+        else
+        {
+            _price.Setup(price);
+        }
 
         _actionButton.button.gameObject.SetActive(actionSetup != null);
 
@@ -59,7 +66,9 @@ public class InformationPanel : UIPanel
             {
                 _optionButtons[i].text.text = optionsSetup[i].text;
 
-                _optionButtons[i].button.onClick.AddListener(() => optionsSetup[i].action.Invoke());
+                int index = i;
+
+                _optionButtons[i].button.onClick.AddListener(() => optionsSetup[index].action.Invoke());
             }
         }
     }
@@ -81,4 +90,13 @@ public class OptionSetup
     public string text;
 
     public Action action;
+
+
+
+    public OptionSetup(string text, Action action)
+    {
+        this.text = text;
+
+        this.action = action;
+    }
 }

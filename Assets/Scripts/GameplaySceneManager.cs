@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class GameplaySceneManager : MonoBehaviour
 {
@@ -12,6 +15,9 @@ public class GameplaySceneManager : MonoBehaviour
 
     [SerializeField]
     private CellBase _hovered = null;
+
+    [SerializeField]
+    private Cell _selected = null;
 
 
 
@@ -26,7 +32,7 @@ public class GameplaySceneManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
             Click();
         }
@@ -55,19 +61,136 @@ public class GameplaySceneManager : MonoBehaviour
 
             Debug.Log(objectHit);
 
-            if (objectHit.tag == "CellAdd")
+            if (objectHit.tag == "Cell")
+            {
+                Cell cell = objectHit.GetComponent<Cell>();
+
+                ClickCell(cell);
+            }
+            else if (objectHit.tag == "CellAdd")
             {
                 CellAdd cell = objectHit.GetComponent<CellAdd>();
 
-                if (SaveLoadManager.Data.TryPay(new Price(gold: 5)))
-                {
-                    _terrain.AddNewCell(cell.Position);
+                ClickCellAdd(cell);
+            }
+            else if (_selected != null)
+            {
+                _selected.Unselect();
 
-                    RefreshResources();
-                }
+                _selected = null;
+
+                _uiManager.Information.Close();
             }
         }
+        else if (_selected != null)
+        {
+            _selected.Unselect();
+
+            _selected = null;
+
+            _uiManager.Information.Close();
+        }
     }
+
+    private void ClickCell(Cell cell)
+    {
+        if(_selected != null)
+        {
+            _selected.Unselect();
+        }
+
+        _selected = cell;
+
+        _selected.Select();
+
+        _uiManager.Information.Open();
+
+        switch (cell.Data.Building)
+        {
+            case EBuilding.Factory:
+                if (CanUpgrade(EBuilding.Factory, cell.Data.Level, out Price factoryPrice))
+                {
+                    _uiManager.Information.Setup($"Factory [Level {cell.Data.Level}]", factoryPrice, 
+                        new OptionSetup("Upgrade Factory", () => UpgradeEvent(cell.Data.Position, factoryPrice)));
+                }
+                else
+                {
+                    _uiManager.Information.Setup($"Factory [Max Level {cell.Data.Level}]");
+                }
+
+                break;
+
+            case EBuilding.House:
+                if (CanUpgrade(EBuilding.House, cell.Data.Level, out Price housePrice))
+                {
+                    _uiManager.Information.Setup($"House [Level {cell.Data.Level}]", housePrice,
+                        new OptionSetup("Upgrade House", () => UpgradeEvent(cell.Data.Position, housePrice)));
+                }
+                else
+                {
+                    _uiManager.Information.Setup($"House [Max Level {cell.Data.Level}]");
+                }
+
+                break;
+
+            case EBuilding.Production:
+                if (CanUpgrade(EBuilding.Production, cell.Data.Level, out Price productionPrice))
+                {
+                    _uiManager.Information.Setup($"Production [Level {cell.Data.Level}]", productionPrice,
+                        new OptionSetup("Upgrade Production", () => UpgradeEvent(cell.Data.Position, productionPrice)));
+                }
+                else
+                {
+                    _uiManager.Information.Setup($"Production [Max Level {cell.Data.Level}]");
+                }
+
+                break;
+
+            case EBuilding.Warehouse:
+                if (CanUpgrade(EBuilding.Warehouse, cell.Data.Level, out Price warehousePrice))
+                {
+                    _uiManager.Information.Setup($"Warehouse [Level {cell.Data.Level}]", warehousePrice,
+                        new OptionSetup("Upgrade Warehouse", () => UpgradeEvent(cell.Data.Position, warehousePrice)));
+                }
+                else
+                {
+                    _uiManager.Information.Setup($"Warehouse [Max Level {cell.Data.Level}]");
+                }
+
+                break;
+
+            default:
+                _uiManager.Information.Setup("Empty Terrain", 
+                    optionsSetup: new OptionSetup[4]
+                    {
+                        new OptionSetup("Build Factory", () => BuildEvent("Build Factory", cell.Data.Position, EBuilding.Factory)),
+                        new OptionSetup("Build House", () => BuildEvent("Build House", cell.Data.Position, EBuilding.House)),
+                        new OptionSetup("Build Production", () => BuildEvent("Build Production",  cell.Data.Position, EBuilding.Production)),
+                        new OptionSetup("Build Warehouse", () => BuildEvent("Build Warehouse", cell.Data.Position, EBuilding.Warehouse))
+                    });
+                break;
+        }
+    }
+
+    private void ClickCellAdd(CellAdd cell)
+    {
+        if (SaveLoadManager.Data.TryPay(Balance.NewTerrain))
+        {
+            _terrain.AddNewCell(cell.Position);
+
+            RefreshResources();
+        }
+
+        if (_selected != null)
+        {
+            _selected.Unselect();
+
+            _selected = null;
+
+            _uiManager.Information.Close();
+        }
+    }
+
 
     private void Hover()
     {
@@ -83,15 +206,45 @@ public class GameplaySceneManager : MonoBehaviour
 
             if (objectHit.tag == "Cell")
             {
-                HoverCell(objectHit, objectHit.name);
+                Cell cell = objectHit.GetComponent<Cell>();
+
+                string cellName;
+
+                switch(cell.Data.Building)
+                {
+                    case EBuilding.Factory:
+                        cellName = $"Factory [Level {cell.Data.Level}]";
+                        break;
+
+                    case EBuilding.House:
+                        cellName = $"House [Level {cell.Data.Level}]";
+                        break;
+
+                    case EBuilding.Production:
+                        cellName = $"Production [Level {cell.Data.Level}]";
+                        break;
+
+                    case EBuilding.Warehouse:
+                        cellName = $"Warehouse [Level {cell.Data.Level}]";
+                        break;
+
+                    default:
+                        cellName = "Empty Terrain";
+                        break;
+                }
+
+                HoverCell(objectHit, cellName);
             }
             else if(objectHit.tag == "CellAdd")
             {
-                HoverCell(objectHit, $"New Terrain", new Price(gold:5));
+                HoverCell(objectHit, $"New Terrain", Balance.NewTerrain);
             }
             else if (_hovered != null)
             {
-                _hovered.Unselect();
+                if (_hovered != _selected)
+                {
+                    _hovered.Unselect();
+                }
 
                 _hovered = null;
 
@@ -100,7 +253,10 @@ public class GameplaySceneManager : MonoBehaviour
         }
         else if (_hovered != null)
         {
-            _hovered.Unselect();
+            if (_hovered != _selected)
+            {
+                _hovered.Unselect();
+            }
 
             _hovered = null;
 
@@ -111,7 +267,10 @@ public class GameplaySceneManager : MonoBehaviour
         {
             if (_hovered != null)
             {
-                _hovered.Unselect();
+                if (_hovered != _selected)
+                {
+                    _hovered.Unselect();
+                }
 
                 _uiManager.ShortInfo.Close();
             }
@@ -130,6 +289,97 @@ public class GameplaySceneManager : MonoBehaviour
             }
 
             _uiManager.ShortInfo.Open();
+        }
+    }
+
+
+
+    private void BuildEvent(string text, Vector2Int position, EBuilding building)
+    {
+        _uiManager.Information.Open();
+
+        Price price;
+
+        switch(building)
+        {
+            case EBuilding.Factory:
+                price = Balance.Factory.Buy;
+                break;
+
+            case EBuilding.House:
+                price = Balance.House.Buy;
+                break;
+
+            case EBuilding.Production:
+                price = Balance.Production.Buy;
+                break;
+
+            case EBuilding.Warehouse:
+                price = Balance.Warehouse.Buy;
+                break;
+
+            default:
+                throw new NotImplementedException();
+        }
+
+        _uiManager.Information.Setup(text, price, new OptionSetup("Build", () => BuildEvent(position, building, price)));
+    }
+
+    private void BuildEvent(Vector2Int position, EBuilding building, Price price)
+    {
+        if (SaveLoadManager.Data.TryPay(price))
+        {
+            _uiManager.Information.Close();
+
+            _terrain.BuildOnCell(position, building);
+
+            RefreshResources();
+        }
+    }
+
+    private void UpgradeEvent(Vector2Int position, Price price)
+    {
+        if(SaveLoadManager.Data.TryPay(price))
+        {
+            _uiManager.Information.Close();
+
+            _terrain.UpgradeCell(position);
+
+            RefreshResources();
+        }
+    }
+
+    private bool CanUpgrade(EBuilding building, int level, out Price price)
+    {
+        switch(building)
+        {
+            case EBuilding.Factory:
+                price = Balance.Factory.Upgrade(level);
+
+                return level < Balance.Factory.MaxLevel;
+
+            case EBuilding.House:
+                price = Balance.House.Upgrade(level);
+
+                return level < Balance.House.MaxLevel;
+
+            case EBuilding.Production:
+                price = Balance.Production.Upgrade(level);
+
+                return level < Balance.Production.MaxLevel;
+
+            case EBuilding.Warehouse:
+                price = Balance.Warehouse.Upgrade(level);
+
+                return level < Balance.Warehouse.MaxLevel;
+
+            case EBuilding.None:
+                price = null;
+
+                return false;
+
+            default:
+                throw new NotImplementedException();
         }
     }
 }
