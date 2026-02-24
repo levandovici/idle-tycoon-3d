@@ -30,12 +30,6 @@ public class TerrainData
     private int _maxZ = 2;
 
     [SerializeField]
-    private int _maxSizeX = 32;
-
-    [SerializeField]
-    private int _maxSizeZ = 32;
-
-    [SerializeField]
     private CellData[] _cellsArray = new CellData[0];
 
     [SerializeField]
@@ -135,32 +129,6 @@ public class TerrainData
         }
     }
 
-    public int MaxSizeX
-    {
-        get
-        {
-            return _maxSizeX;
-        }
-
-        private set
-        {
-            _maxSizeX = value;
-        }
-    }
-
-    public int MaxSizeZ
-    {
-        get
-        {
-            return _maxSizeZ;
-        }
-
-        private set
-        {
-            _maxSizeZ = value;
-        }
-    }
-
 
     public CellData[] Cells
     {
@@ -193,12 +161,7 @@ public class TerrainData
 
     }
 
-    public TerrainData(int sizeX, int sizeZ) : this(sizeX, sizeZ, 32, 32)
-    {
-
-    }
-
-    public TerrainData(int sizeX, int sizeZ, int maxSizeX, int maxSizeZ)
+    public TerrainData(int sizeX, int sizeZ)
     {
         SizeX = sizeX;
 
@@ -212,11 +175,6 @@ public class TerrainData
         MinZ = -sizeZ / 2 * 2;
 
         MaxZ = (sizeZ - 1) / 2 * 2;
-
-
-        MaxSizeX = maxSizeX;
-
-        MaxSizeZ = maxSizeZ;
 
 
         _cellsArray = new CellData[0];

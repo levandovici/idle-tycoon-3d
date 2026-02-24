@@ -23,6 +23,9 @@ public class GameplaySceneManager : MonoBehaviour
     [SerializeField]
     private Price _resources = null;
 
+    [SerializeField]
+    private HumanSpawner _spawner;
+
 
 
     private void Awake()
@@ -37,6 +40,10 @@ public class GameplaySceneManager : MonoBehaviour
 
 
         _terrain.Setup(SaveLoadManager.Data.Terrain);
+
+        _terrain.Bounds(out float minX, out float maxX, out float minZ, out float maxZ);
+
+        _spawner.Spawn(minX, maxX, minZ, maxZ, 30);
 
 
         _uiManager.OnWindowChanged += OpenEvent;

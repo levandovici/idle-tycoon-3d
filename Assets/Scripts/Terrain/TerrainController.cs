@@ -61,6 +61,19 @@ public class TerrainController : MonoBehaviour
 
 
 
+    public void Bounds(out float minX, out float maxX, out float minZ, out float maxZ)
+    {
+        minX = _terrainData.MinX / 2 * _cellSize + _terrainData.MinX / 2 * _connectionSize;
+
+        maxX = _terrainData.MaxX / 2 * _cellSize + _terrainData.MaxX / 2 * _connectionSize;
+
+        minZ = _terrainData.MinZ / 2 * _cellSize + _terrainData.MinZ / 2 * _connectionSize;
+
+        maxZ = _terrainData.MaxZ / 2 * _cellSize + _terrainData.MaxZ / 2 * _connectionSize;
+    }
+
+
+
     public void AddNewCell(Vector2Int position)
     {
         _terrainData.AddNewCell(position);

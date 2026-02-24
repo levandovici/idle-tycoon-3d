@@ -9498,6 +9498,7 @@ GameObject:
   - component: {fileID: 1672588535}
   - component: {fileID: 1672588534}
   - component: {fileID: 1672588536}
+  - component: {fileID: 1672588537}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -9560,6 +9561,7 @@ MonoBehaviour:
     _money: 0
     _gold: 0
     _diamonds: 0
+  _spawner: {fileID: 1672588537}
 --- !u!114 &1672588536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9579,8 +9581,6 @@ MonoBehaviour:
     _maxX: 0
     _minZ: 0
     _maxZ: 0
-    _maxSizeX: 0
-    _maxSizeZ: 0
     _cellsArray: []
     _connectionsArray: []
     _jointsArray: []
@@ -9605,6 +9605,18 @@ MonoBehaviour:
     type: 3}
   _cellSize: 40
   _connectionSize: 15
+--- !u!114 &1672588537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672588532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4db6d506a6aa1a042856e0a4a838a648, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1673936505
 GameObject:
   m_ObjectHideFlags: 0
