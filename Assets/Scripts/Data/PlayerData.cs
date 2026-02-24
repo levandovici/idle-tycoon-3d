@@ -13,6 +13,9 @@ public class PlayerData
     [SerializeField]
     private TerrainData _terrain = new TerrainData(3, 3);
 
+    [SerializeField]
+    private ELevel _level = ELevel.Easy;
+
 
 
     public Price Resources
@@ -119,6 +122,19 @@ public class PlayerData
         }
     }
 
+    public ELevel Level
+    {
+        get
+        {
+            return _level;
+        }
+
+        set
+        {
+            _level = value;
+        }
+    }
+
 
 
     public PlayerData() : this(200, 500, 300, 600, 50, 10)
@@ -126,17 +142,24 @@ public class PlayerData
 
     }
 
-    public PlayerData(int containers, int planks, int bricks, int money, int gold, int diamonds) : 
-        this(containers, planks, bricks, money, gold, diamonds, new TerrainData(3, 3))
+    public PlayerData(ELevel level) : this(200, 500, 300, 600, 50, 10, new TerrainData(3, 3), level)
     {
 
     }
 
-    public PlayerData(int containers, int planks, int bricks, int money, int gold, int diamonds, TerrainData terrain)
+    public PlayerData(int containers, int planks, int bricks, int money, int gold, int diamonds) : 
+        this(containers, planks, bricks, money, gold, diamonds, new TerrainData(3, 3), ELevel.Easy)
+    {
+
+    }
+
+    public PlayerData(int containers, int planks, int bricks, int money, int gold, int diamonds, TerrainData terrain, ELevel level)
     {
         Resources = new Price(containers, planks, bricks, money, gold, diamonds);
 
         Terrain = terrain;
+
+        Level = level;
     }
 
 
@@ -152,4 +175,9 @@ public class PlayerData
 
         return false;
     }
+}
+
+public enum ELevel
+{
+    Easy = 1, Medium = 3, Hard = 5
 }

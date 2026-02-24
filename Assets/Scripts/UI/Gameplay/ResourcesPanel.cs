@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -23,6 +24,25 @@ public class ResourcesPanel : UIPanel
 
     [SerializeField]
     private TextMeshProUGUI _diamonds;
+
+    [SerializeField]
+    private Button _settings;
+
+
+
+    public event Action OnSettings;
+
+
+
+    private void Awake()
+    {
+        _settings.onClick.AddListener(SettingsEvent);
+    }
+
+    private void OnDestroy()
+    {
+        _settings.onClick.RemoveListener(SettingsEvent);
+    }
 
 
 
@@ -71,5 +91,12 @@ public class ResourcesPanel : UIPanel
     public void SetupDiamonds(int count)
     {
         _diamonds.text = $"{count}";
+    }
+
+
+
+    private void SettingsEvent()
+    {
+        OnSettings?.Invoke();
     }
 }

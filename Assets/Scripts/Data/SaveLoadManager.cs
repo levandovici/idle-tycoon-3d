@@ -7,11 +7,15 @@ using UnityEngine;
 
 public static class SaveLoadManager
 {
-    private const string _path = "data.json";
+    private const string _dataPath = "data.json";
+
+    private const string _settingsPath = "settings.json";
 
 
 
     private static PlayerData _data = null;
+
+    private static SettingsData _settings = null;
 
 
 
@@ -21,6 +25,32 @@ public static class SaveLoadManager
         {
             return _data;
         }
+
+        set
+        {
+            _data = value;
+        }
+    }
+
+    public static SettingsData Settings
+    {
+        get
+        {
+            return _settings;
+        }
+
+        private set
+        {
+            _settings = value;
+        }
+    }
+
+    public static bool CanContinue
+    {
+        get
+        {
+            return _data != null;
+        }
     }
 
 
@@ -28,37 +58,62 @@ public static class SaveLoadManager
     public static void Save()
     {
 #if UNITY_EDITOR
-        string path = Path.Combine(Application.dataPath, _path);
+        string dataPath = Path.Combine(Application.dataPath, _dataPath);
+
+        string settingsPath = Path.Combine(Application.dataPath, _settingsPath);
 #else
-        string path = Path.Combine(Application.persistentDataPath, _path);
+        string dataPath = Path.Combine(Application.persistentDataPath, _path);
+
+        string settingsPath = Path.Combine(Application.persistentDataPath, _settingsPath);
 #endif
 
-        _data.Terrain.Save();
 
-        string json = JsonUtility.ToJson(_data, true);
+        Data.Terrain.Save();
 
-        File.WriteAllText(path, json);
+        string dataJson = JsonUtility.ToJson(Data, true);
+
+        File.WriteAllText(dataPath, dataJson);
+
+
+        string settingsJson = JsonUtility.ToJson(Settings, true);
+
+        File.WriteAllText(settingsPath, settingsJson);
     }
 
     public static void Load()
     {
 #if UNITY_EDITOR
-        string path = Path.Combine(Application.dataPath, _path);
+        string dataPath = Path.Combine(Application.dataPath, _dataPath);
+
+        string settingsPath = Path.Combine(Application.dataPath, _settingsPath);
 #else
-        string path = Path.Combine(Application.persistentDataPath, _path);
+        string dataPath = Path.Combine(Application.persistentDataPath, _path);
+
+        string settingsPath = Path.Combine(Application.persistentDataPath, _settingsPath);
 #endif
 
         try
         {
-            string json = File.ReadAllText(path);
+            string dataJson = File.ReadAllText(dataPath);
 
-            _data = JsonUtility.FromJson<PlayerData>(json);
+            Data = JsonUtility.FromJson<PlayerData>(dataJson);
 
-            _data.Terrain.Load();
+            Data.Terrain.Load();
         }
         catch(Exception e)
         {
-            _data = new PlayerData();
+            Debug.LogWarning(e.StackTrace);
+        }
+
+        try
+        {
+            string settingsJson = File.ReadAllText(settingsPath);
+
+            Settings = JsonUtility.FromJson<SettingsData>(settingsJson);
+        }
+        catch (Exception e)
+        {
+            Settings = new SettingsData();
 
             Debug.LogWarning(e.StackTrace);
         }

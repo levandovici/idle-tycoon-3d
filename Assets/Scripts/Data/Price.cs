@@ -131,6 +131,16 @@ public class Price
 
 
 
+    public static Price operator *(Price a, int multiplier)
+    {
+        if (a is null)
+            throw new ArgumentNullException();
+
+        return new Price(a.Containers * multiplier, a.Planks * multiplier, a.Bricks * multiplier, a.Money * multiplier, a.Gold * multiplier, a.Diamonds * multiplier);
+    }
+
+
+
     public static Price operator +(Price a, Price b)
     {
         if (a is null || b is null)

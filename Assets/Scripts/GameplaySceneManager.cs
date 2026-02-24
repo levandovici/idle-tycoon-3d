@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameplaySceneManager : MonoBehaviour
 {
@@ -26,13 +27,31 @@ public class GameplaySceneManager : MonoBehaviour
 
     private void Awake()
     {
-        SaveLoadManager.Load();
-
+#if UNITY_EDITOR
+        if(SaveLoadManager.Data == null)
+        {
+            SceneManager.LoadScene(0);
+        }
+#endif
         _resources = SaveLoadManager.Data.Resources.Clone();
 
-        RefreshResources();
 
         _terrain.Setup(SaveLoadManager.Data.Terrain);
+
+
+        _uiManager.OnWindowChanged += OpenEvent;
+
+
+        _uiManager.Resources.OnSettings += OpenSettings;
+
+
+        _uiManager.Settings.OnBack += OpenGameplay;
+
+        _uiManager.Settings.OnExit += Exit;
+
+        _uiManager.Settings.OnMusicChanged += MusicChangedEvent;
+
+        _uiManager.Settings.OnSfxChanged += SfxChangedEvent;
     }
 
     private void Update()
@@ -50,6 +69,67 @@ public class GameplaySceneManager : MonoBehaviour
 
             RefreshResources();
         }
+    }
+
+
+
+    private void Exit()
+    {
+        Save();
+
+        LoadingSceneManager.LoadingSceneIndex = 1;
+
+        SceneManager.LoadScene(0);
+    }
+
+
+
+    private void OpenGameplay()
+    {
+        _uiManager.Setup(EGameplayWindow.Gameplay);
+    }
+
+    private void OpenSettings()
+    {
+        _uiManager.Setup(EGameplayWindow.Settings);
+    }
+
+
+
+    private void MusicChangedEvent(float value)
+    {
+        SaveLoadManager.Settings.Music = value;
+    }
+
+    private void SfxChangedEvent(float value)
+    {
+        SaveLoadManager.Settings.Sfx = value;
+    }
+
+
+
+    private void OpenEvent(EGameplayWindow window)
+    {
+        switch(window)
+        {
+            case EGameplayWindow.Gameplay:
+                OpenGameplayEvent();
+                break;
+
+            case EGameplayWindow.Settings:
+                OpenSettingsEvent();
+                break;
+        }
+    }
+
+    private void OpenGameplayEvent()
+    {
+        RefreshResources();
+    }
+
+    private void OpenSettingsEvent()
+    {
+        _uiManager.Settings.Setup(SaveLoadManager.Settings.Music, SaveLoadManager.Settings.Sfx);
     }
 
 
@@ -186,7 +266,7 @@ public class GameplaySceneManager : MonoBehaviour
 
     private void ClickCellAdd(CellAdd cell)
     {
-        if (SaveLoadManager.Data.TryPay(Balance.NewTerrain))
+        if (SaveLoadManager.Data.TryPay(Balance.NewTerrain * (int)SaveLoadManager.Data.Level))
         {
             _terrain.AddNewCell(cell.Position);
 
@@ -249,7 +329,7 @@ public class GameplaySceneManager : MonoBehaviour
             }
             else if(objectHit.tag == "CellAdd")
             {
-                HoverCell(objectHit, $"New Terrain", Balance.NewTerrain);
+                HoverCell(objectHit, $"New Terrain", Balance.NewTerrain * (int)SaveLoadManager.Data.Level);
             }
             else if (_hovered != null)
             {
@@ -315,19 +395,19 @@ public class GameplaySceneManager : MonoBehaviour
         switch(building)
         {
             case EBuilding.Factory:
-                price = Balance.Factory.Buy;
+                price = Balance.Factory.Buy * (int)SaveLoadManager.Data.Level;
                 break;
 
             case EBuilding.House:
-                price = Balance.House.Buy;
+                price = Balance.House.Buy * (int)SaveLoadManager.Data.Level;
                 break;
 
             case EBuilding.Production:
-                price = Balance.Production.Buy;
+                price = Balance.Production.Buy * (int)SaveLoadManager.Data.Level;
                 break;
 
             case EBuilding.Warehouse:
-                price = Balance.Warehouse.Buy;
+                price = Balance.Warehouse.Buy * (int)SaveLoadManager.Data.Level;
                 break;
 
             default:
@@ -366,22 +446,22 @@ public class GameplaySceneManager : MonoBehaviour
         switch(building)
         {
             case EBuilding.Factory:
-                price = Balance.Factory.Upgrade(level);
+                price = Balance.Factory.Upgrade(level) * (int)SaveLoadManager.Data.Level;
 
                 return level < Balance.Factory.MaxLevel;
 
             case EBuilding.House:
-                price = Balance.House.Upgrade(level);
+                price = Balance.House.Upgrade(level) * (int)SaveLoadManager.Data.Level;
 
                 return level < Balance.House.MaxLevel;
 
             case EBuilding.Production:
-                price = Balance.Production.Upgrade(level);
+                price = Balance.Production.Upgrade(level) * (int)SaveLoadManager.Data.Level;
 
                 return level < Balance.Production.MaxLevel;
 
             case EBuilding.Warehouse:
-                price = Balance.Warehouse.Upgrade(level);
+                price = Balance.Warehouse.Upgrade(level) * (int)SaveLoadManager.Data.Level;
 
                 return level < Balance.Warehouse.MaxLevel;
 

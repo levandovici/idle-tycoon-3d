@@ -1,10 +1,10 @@
 {
     "_resources": {
         "_containers": 200,
-        "_planks": 490,
-        "_bricks": 265,
-        "_money": 752,
-        "_gold": 270,
+        "_planks": 500,
+        "_bricks": 285,
+        "_money": 1551,
+        "_gold": 50,
         "_diamonds": 10
     },
     "_terrain": {
@@ -30,7 +30,7 @@
                     "x": -2,
                     "y": 0
                 },
-                "_building": 1,
+                "_building": 0,
                 "_level": 1
             },
             {
@@ -96,14 +96,14 @@
                     "x": -3,
                     "y": -2
                 },
-                "_type": 2
+                "_type": 1
             },
             {
                 "_position": {
                     "x": -2,
                     "y": -3
                 },
-                "_type": 1
+                "_type": 2
             },
             {
                 "_position": {
@@ -117,14 +117,14 @@
                     "x": -2,
                     "y": -1
                 },
-                "_type": 1
+                "_type": 2
             },
             {
                 "_position": {
                     "x": -3,
                     "y": 0
                 },
-                "_type": 2
+                "_type": 1
             },
             {
                 "_position": {
@@ -166,28 +166,28 @@
                     "x": 0,
                     "y": -3
                 },
-                "_type": 1
+                "_type": 2
             },
             {
                 "_position": {
                     "x": 1,
                     "y": -2
                 },
-                "_type": 2
+                "_type": 1
             },
             {
                 "_position": {
                     "x": 0,
                     "y": -1
                 },
-                "_type": 2
+                "_type": 1
             },
             {
                 "_position": {
                     "x": 1,
                     "y": 0
                 },
-                "_type": 2
+                "_type": 1
             },
             {
                 "_position": {
@@ -222,7 +222,7 @@
                     "x": 3,
                     "y": -2
                 },
-                "_type": 2
+                "_type": 1
             },
             {
                 "_position": {
@@ -268,8 +268,8 @@
                 },
                 "_joints": [
                     false,
-                    false,
                     true,
+                    false,
                     false
                 ]
             },
@@ -280,9 +280,9 @@
                 },
                 "_joints": [
                     false,
-                    false,
                     true,
-                    true
+                    false,
+                    false
                 ]
             },
             {
@@ -294,7 +294,7 @@
                     false,
                     true,
                     false,
-                    true
+                    false
                 ]
             },
             {
@@ -315,8 +315,8 @@
                     "y": -3
                 },
                 "_joints": [
-                    false,
-                    false,
+                    true,
+                    true,
                     true,
                     false
                 ]
@@ -327,8 +327,8 @@
                     "y": -1
                 },
                 "_joints": [
-                    false,
                     true,
+                    false,
                     true,
                     true
                 ]
@@ -363,9 +363,9 @@
                     "y": -3
                 },
                 "_joints": [
+                    true,
+                    true,
                     false,
-                    true,
-                    true,
                     false
                 ]
             },
@@ -375,10 +375,10 @@
                     "y": -1
                 },
                 "_joints": [
+                    false,
                     true,
-                    true,
-                    true,
-                    true
+                    false,
+                    false
                 ]
             },
             {
@@ -390,7 +390,7 @@
                     true,
                     true,
                     true,
-                    true
+                    false
                 ]
             },
             {
@@ -413,7 +413,7 @@
                 "_joints": [
                     true,
                     false,
-                    true,
+                    false,
                     false
                 ]
             },
@@ -426,7 +426,7 @@
                     true,
                     false,
                     true,
-                    true
+                    false
                 ]
             },
             {
@@ -454,5 +454,6 @@
                 ]
             }
         ]
-    }
+    },
+    "_level": 1
 }
