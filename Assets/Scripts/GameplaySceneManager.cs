@@ -31,11 +31,13 @@ public class GameplaySceneManager : MonoBehaviour
     private void Awake()
     {
 #if UNITY_EDITOR
-        if(SaveLoadManager.Data == null)
+        if(SoundManager.Instance == null)
         {
             SceneManager.LoadScene(0);
         }
 #endif
+        SoundManager.Instance.Play(EMusic.Gameplay);
+
         _resources = SaveLoadManager.Data.Resources.Clone();
 
 
@@ -433,6 +435,12 @@ public class GameplaySceneManager : MonoBehaviour
             _terrain.BuildOnCell(position, building);
 
             RefreshResources();
+
+            SoundManager.Instance.Play(ESfx.Click);
+        }
+        else
+        {
+            SoundManager.Instance.Play(ESfx.Error);
         }
     }
 
@@ -445,6 +453,12 @@ public class GameplaySceneManager : MonoBehaviour
             _terrain.UpgradeCell(position);
 
             RefreshResources();
+
+            SoundManager.Instance.Play(ESfx.Click);
+        }
+        else
+        {
+            SoundManager.Instance.Play(ESfx.Error);
         }
     }
 

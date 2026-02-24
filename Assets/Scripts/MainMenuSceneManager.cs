@@ -12,6 +12,15 @@ public class MainMenuSceneManager : MonoBehaviour
 
     private void Awake()
     {
+#if UNITY_EDITOR
+        if (SaveLoadManager.Data == null || SoundManager.Instance == null)
+        {
+            SceneManager.LoadScene(0);
+        }
+#endif
+
+        SoundManager.Instance.Play(EMusic.MainMenu);
+
         SaveLoadManager.Load();
 
         _uiManager.OnWindowChanged += OpenEvent;

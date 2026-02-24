@@ -34,6 +34,11 @@ public class LoadingSceneManager : MonoBehaviour
         StartCoroutine(LoadingProcess(LoadingSceneIndex));
     }
 
+    private void Start()
+    {
+        SoundManager.Instance.Play(EMusic.Loading);
+    }
+
     private IEnumerator LoadingProcess(int sceneIndex)
     {
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneIndex);

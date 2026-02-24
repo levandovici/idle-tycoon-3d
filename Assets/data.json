@@ -3,7 +3,7 @@
         "_containers": 200,
         "_planks": 500,
         "_bricks": 285,
-        "_money": 1551,
+        "_money": 1631,
         "_gold": 50,
         "_diamonds": 10
     },
@@ -14,8 +14,6 @@
         "_maxX": 2,
         "_minZ": -2,
         "_maxZ": 2,
-        "_maxSizeX": 32,
-        "_maxSizeZ": 32,
         "_cellsArray": [
             {
                 "_position": {

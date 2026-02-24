@@ -66,16 +66,22 @@ public class SettingsPanel : UIPanel
 
     private void MusicChangedEvent(float volume)
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnMusicChanged?.Invoke(volume);
     }
 
     private void SfxChangedEvent(float volume)
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnSfxChanged?.Invoke(volume);
     }
 
     private void BackEvent()
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnBack?.Invoke();
     }
 }

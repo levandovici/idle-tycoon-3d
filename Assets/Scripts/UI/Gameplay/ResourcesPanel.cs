@@ -97,6 +97,8 @@ public class ResourcesPanel : UIPanel
 
     private void SettingsEvent()
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnSettings?.Invoke();
     }
 }

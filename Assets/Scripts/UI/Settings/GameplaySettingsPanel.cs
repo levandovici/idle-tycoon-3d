@@ -33,6 +33,8 @@ public class GameplaySettingsPanel : SettingsPanel
 
     private void ExitEvent()
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnExit?.Invoke();
     }
 }

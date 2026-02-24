@@ -56,21 +56,29 @@ public class LevelsPanel : UIPanel
 
     private void EasyEvent()
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnEasy?.Invoke();
     }
 
     private void MediumEvent()
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnMedium?.Invoke();
     }
 
     private void HardEvent()
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnHard?.Invoke();
     }
 
     private void BackEvent()
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnBack?.Invoke();
     }
 }

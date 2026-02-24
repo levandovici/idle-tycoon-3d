@@ -54,16 +54,22 @@ public class MainMenuPanel : UIPanel
 
     private void ContinueEvent()
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnContinue?.Invoke();
     }
 
     private void LevelsEvent()
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnLevels?.Invoke();
     }
 
     private void SettingsEvent()
     {
+        SoundManager.Instance.Play(ESfx.Click);
+
         OnSettings?.Invoke();
     }
 }
