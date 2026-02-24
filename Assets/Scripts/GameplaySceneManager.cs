@@ -31,7 +31,7 @@ public class GameplaySceneManager : MonoBehaviour
     private void Awake()
     {
 #if UNITY_EDITOR
-        if(SoundManager.Instance == null)
+        if(SaveLoadManager.Data == null || SoundManager.Instance == null)
         {
             SceneManager.LoadScene(0);
         }
