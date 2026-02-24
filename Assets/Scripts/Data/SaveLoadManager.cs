@@ -62,7 +62,7 @@ public static class SaveLoadManager
 
         string settingsPath = Path.Combine(Application.dataPath, _settingsPath);
 #else
-        string dataPath = Path.Combine(Application.persistentDataPath, _path);
+        string dataPath = Path.Combine(Application.persistentDataPath, _dataPath);
 
         string settingsPath = Path.Combine(Application.persistentDataPath, _settingsPath);
 #endif
@@ -87,7 +87,7 @@ public static class SaveLoadManager
 
         string settingsPath = Path.Combine(Application.dataPath, _settingsPath);
 #else
-        string dataPath = Path.Combine(Application.persistentDataPath, _path);
+        string dataPath = Path.Combine(Application.persistentDataPath, _dataPath);
 
         string settingsPath = Path.Combine(Application.persistentDataPath, _settingsPath);
 #endif
