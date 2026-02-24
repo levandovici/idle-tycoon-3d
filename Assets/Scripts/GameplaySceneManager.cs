@@ -36,6 +36,9 @@ public class GameplaySceneManager : MonoBehaviour
             SceneManager.LoadScene(0);
         }
 #endif
+
+        SoundManager.Instance.Setup(SaveLoadManager.Settings.Music, SaveLoadManager.Settings.Sfx);
+
         SoundManager.Instance.Play(EMusic.Gameplay);
 
         _resources = SaveLoadManager.Data.Resources.Clone();
@@ -108,11 +111,15 @@ public class GameplaySceneManager : MonoBehaviour
     private void MusicChangedEvent(float value)
     {
         SaveLoadManager.Settings.Music = value;
+
+        SoundManager.Instance.SetupMusic(value);
     }
 
     private void SfxChangedEvent(float value)
     {
         SaveLoadManager.Settings.Sfx = value;
+
+        SoundManager.Instance.SetupSfx(value);
     }
 
 

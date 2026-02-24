@@ -94,12 +94,12 @@ public class SoundManager : MonoBehaviour
     }
 
 
-    private void SetupMusic(float music)
+    public void SetupMusic(float music)
     {
         _music.volume = music;
     }
 
-    private void SetupSfx(float sfx)
+    public void SetupSfx(float sfx)
     {
         _sfx.volume = sfx;
     }

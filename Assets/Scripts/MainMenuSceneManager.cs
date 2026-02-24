@@ -21,6 +21,8 @@ public class MainMenuSceneManager : MonoBehaviour
 
         SaveLoadManager.Load();
 
+        SoundManager.Instance.Setup(SaveLoadManager.Settings.Music, SaveLoadManager.Settings.Sfx);
+
         SoundManager.Instance.Play(EMusic.MainMenu);
 
 
@@ -133,11 +135,15 @@ public class MainMenuSceneManager : MonoBehaviour
     private void MusicChangedEvent(float value)
     {
         SaveLoadManager.Settings.Music = value;
+
+        SoundManager.Instance.SetupMusic(value);
     }
 
     private void SfxChangedEvent(float value)
     {
         SaveLoadManager.Settings.Sfx = value;
+
+        SoundManager.Instance.SetupSfx(value);
     }
 
 
